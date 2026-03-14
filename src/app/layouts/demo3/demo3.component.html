@@ -1,0 +1,33 @@
+<app-theme-toggle></app-theme-toggle>
+
+<!-- Page -->
+<!-- Base -->
+<header app-header class="flex items-center fixed z-10 top-0 left-0 right-0 shrink-0 h-(--header-height) bg-muted" id="header"></header>
+
+<!-- Wrapper -->
+<div class="flex flex-col lg:flex-row grow pt-(--header-height)">
+	<div app-sidebar class="fixed w-(--sidebar-width) lg:top-(--header-height) top-0 bottom-0 z-20 hidden lg:flex flex-col items-stretch shrink-0 group py-3 lg:py-0 [--kt-drawer-enable:true] lg:[--kt-drawer-enable:false]" data-kt-drawer="true" data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0" id="sidebar">
+	</div>
+
+	<!-- Main -->
+	<div app-navbar class="flex items-stretch lg:fixed z-5 top-(--header-height) start-(--sidebar-width) end-5 h-(--navbar-height) mx-5 lg:mx-0 bg-muted" id="navbar">
+	</div>
+
+	<div
+		class="flex grow rounded-b-xl bg-background border-x border-b border-input lg:mt-(--navbar-height) mx-5 lg:ms-(--sidebar-width) mb-5">
+		<div class="flex flex-col grow kt-scrollable-y lg:[scrollbar-width:auto] pt-7 lg:[&_.kt-container-fluid]:pe-4"
+			id="scrollable_content">
+			<!-- Content -->
+			<main class="grow" role="content">
+				<router-outlet></router-outlet>
+			</main>
+			<!-- End of Content -->
+			<footer app-footer class="py-3">
+			</footer>
+		</div>
+	</div>
+	<!-- End of Main -->
+</div>
+<!-- End of Wrapper -->
+<!-- End of Base -->
+<!-- End of Page -->

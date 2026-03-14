@@ -1,0 +1,23 @@
+<app-theme-toggle></app-theme-toggle>
+
+<!-- Page -->
+<!-- Main -->
+<header app-header class="flex items-center shrink-0 bg-background py-4 lg:py-0 lg:h-(--header-height)"
+	data-kt-sticky="true"
+	data-kt-sticky-class="transition-[height] fixed z-10 top-0 left-0 right-0 shadow-xs backdrop-blur-md bg-background/70"
+	data-kt-sticky-name="header" data-kt-sticky-offset="200px" id="header">
+</header>
+
+<!-- Toolbar -->
+<div app-toolbar class="kt-container-fixed"></div>
+<!-- End of Toolbar -->
+
+<!-- Content -->
+<main class="grow" id="content" role="content">
+	<router-outlet></router-outlet>
+</main>
+<!-- End of Content -->
+
+<footer app-footer></footer>
+<!-- End of Main -->
+<!-- End of Page -->
