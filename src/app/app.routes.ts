@@ -20,13 +20,23 @@ import { IndexComponent as Demo9IndexComponent } from './pages/demo9/index/index
 import { Demo10Component } from './layouts/demo10/demo10.component';
 import { IndexComponent as Demo10IndexComponent } from './pages/demo10/index/index.component';
 
+import { UnitTypeListComponent } from './features/unit-types/unit-type-list/unit-type-list.component';
+import { CategoryListComponent } from './features/categories/category-list/category-list.component';
+import { AllergenListComponent } from './features/allergens/allergen-list/allergen-list.component';
+import { MeasurementUnitListComponent } from './features/measurement-units/measurement-unit-list/measurement-unit-list.component';
+
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'demo1' },
+  { path: '', pathMatch: 'full', redirectTo: 'cronos/dashboard' },
   {
-    path: 'demo1',
+    path: 'cronos',
     component: Demo1Component,
     children: [
-      { path: '', component: Demo1IndexComponent },
+      { path: 'dashboard', component: Demo1IndexComponent },
+      { path: 'tipos-unidad', component: UnitTypeListComponent },
+      { path: 'categorias', component: CategoryListComponent },
+      { path: 'alergenos', component: AllergenListComponent },
+      { path: 'unidades-medida', component: MeasurementUnitListComponent },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ],
   },
   {

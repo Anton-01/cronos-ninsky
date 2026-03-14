@@ -1,0 +1,146 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="cancelled.emit()"></div>
+
+  <div class="relative z-10 w-full max-w-xl mx-4">
+    <div class="card shadow-2xl">
+      <div class="card-header border-b border-border">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center size-10 rounded-lg bg-info/10">
+            <i class="ki-filled ki-questionnaire-tablet text-info text-lg"></i>
+          </div>
+          <div>
+            <h3 class="card-title">{{ isEditing ? 'Editar' : 'Nueva' }} Unidad de Medida</h3>
+            <p class="text-xs text-muted-foreground mt-0.5">{{ isEditing ? 'Modifique los datos del registro' : 'Complete los campos para crear un nuevo registro' }}</p>
+          </div>
+        </div>
+        <button (click)="cancelled.emit()" class="kt-btn kt-btn-icon kt-btn-ghost size-8 ms-auto">
+          <i class="ki-filled ki-cross text-sm"></i>
+        </button>
+      </div>
+
+      <div class="card-body">
+        @if (errorMessage()) {
+          <div class="flex items-center gap-2 p-3 mb-4 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
+            <i class="ki-filled ki-information-2"></i>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+          <!-- Row 1: Código + Tipo de Unidad -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-foreground">
+                Código <span class="text-danger">*</span>
+              </label>
+              <input formControlName="codeIdentity" type="text"
+                placeholder="Ej: kg, L, m"
+                class="input uppercase"
+                [class.border-danger]="hasError('codeIdentity')" />
+              @if (hasError('codeIdentity')) {
+                <p class="text-xs text-danger flex items-center gap-1">
+                  <i class="ki-filled ki-information-2 text-xs"></i>
+                  {{ getError('codeIdentity') }}
+                </p>
+              }
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-foreground">
+                Tipo de Unidad <span class="text-danger">*</span>
+              </label>
+              <select formControlName="unitTypeId" class="select" [class.border-danger]="hasError('unitTypeId')">
+                <option [ngValue]="null" disabled>Seleccionar tipo...</option>
+                @for (ut of unitTypes(); track ut.id) {
+                  <option [ngValue]="ut.id">{{ ut.name }}</option>
+                }
+              </select>
+              @if (hasError('unitTypeId')) {
+                <p class="text-xs text-danger flex items-center gap-1">
+                  <i class="ki-filled ki-information-2 text-xs"></i>
+                  {{ getError('unitTypeId') }}
+                </p>
+              }
+            </div>
+          </div>
+
+          <!-- Row 2: Nombre + Plural -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-foreground">
+                Nombre <span class="text-danger">*</span>
+              </label>
+              <input formControlName="name" type="text"
+                placeholder="Ej: Kilogramo"
+                class="input" [class.border-danger]="hasError('name')" />
+              @if (hasError('name')) {
+                <p class="text-xs text-danger flex items-center gap-1">
+                  <i class="ki-filled ki-information-2 text-xs"></i>
+                  {{ getError('name') }}
+                </p>
+              }
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-foreground">
+                Nombre Plural <span class="text-danger">*</span>
+              </label>
+              <input formControlName="namePlural" type="text"
+                placeholder="Ej: Kilogramos"
+                class="input" [class.border-danger]="hasError('namePlural')" />
+              @if (hasError('namePlural')) {
+                <p class="text-xs text-danger flex items-center gap-1">
+                  <i class="ki-filled ki-information-2 text-xs"></i>
+                  {{ getError('namePlural') }}
+                </p>
+              }
+            </div>
+          </div>
+
+          <!-- Row 3: Factor + Es base -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-sm font-medium text-foreground">
+                Factor Multiplicador <span class="text-danger">*</span>
+              </label>
+              <input formControlName="multiplierToBase" type="number" step="any"
+                placeholder="1"
+                class="input" [class.border-danger]="hasError('multiplierToBase')" />
+              @if (hasError('multiplierToBase')) {
+                <p class="text-xs text-danger flex items-center gap-1">
+                  <i class="ki-filled ki-information-2 text-xs"></i>
+                  {{ getError('multiplierToBase') }}
+                </p>
+              }
+              <p class="text-xs text-muted-foreground">Factor de conversión respecto a la unidad base</p>
+            </div>
+
+            <div class="flex flex-col gap-3">
+              <label class="text-sm font-medium text-foreground">Configuración</label>
+              <label class="flex items-center gap-3 cursor-pointer p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors">
+                <input formControlName="isBaseUnit" type="checkbox"
+                  class="checkbox" />
+                <div>
+                  <span class="text-sm font-medium text-foreground">Unidad Base</span>
+                  <p class="text-xs text-muted-foreground">Marca esta unidad como la unidad base del tipo</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end gap-3 pt-2 border-t border-border mt-2">
+            <button type="button" (click)="cancelled.emit()" class="kt-btn kt-btn-outline">Cancelar</button>
+            <button type="submit" class="kt-btn kt-btn-primary gap-2" [disabled]="isSubmitting()">
+              @if (isSubmitting()) {
+                <div class="size-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              } @else {
+                <i class="ki-filled ki-check text-sm"></i>
+              }
+              {{ isEditing ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

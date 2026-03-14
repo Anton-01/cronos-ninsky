@@ -75,7 +75,8 @@
               "buildTarget": "metronic-tailwind-angular:build:production"
             },
             "development": {
-              "buildTarget": "metronic-tailwind-angular:build:development"
+              "buildTarget": "metronic-tailwind-angular:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

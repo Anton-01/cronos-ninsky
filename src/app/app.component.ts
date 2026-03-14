@@ -19,7 +19,7 @@ export class AppComponent {
   private metronicInitService = inject(MetronicInitService);
 
   private demoClassMap: Record<string, string> = {
-    demo1: 'demo1 kt-sidebar-fixed kt-header-fixed',
+    cronos: 'demo1 kt-sidebar-fixed kt-header-fixed',
     demo2: '[--header-height:100px] data-[kt-sticky-header=on]:[--header-height:60px]',
     demo3: '[--header-height:58px] [--sidebar-width:58px] [--navbar-height:56px] lg:overflow-hidden bg-muted',
     demo4: '[--header-height:60px] [--sidebar-width:290px] bg-muted! lg:overflow-hidden',
@@ -30,7 +30,7 @@ export class AppComponent {
     demo9: '[--header-height:78px]',
     demo10: '[--header-height:60px] [--sidebar-width:270px] lg:overflow-hidden bg-mono dark:bg-background',
   };
-  private currentDemo = signal('demo1');
+  private currentDemo = signal('cronos');
 
   constructor() {
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
@@ -45,8 +45,8 @@ export class AppComponent {
 
   private updateDemo() {
     const url = this.router.url;
-    const firstSegment = url.split('/').filter(Boolean)[0] || 'demo1';
-    const newDemo = firstSegment in this.demoClassMap ? firstSegment : 'demo1';
+    const firstSegment = url.split('/').filter(Boolean)[0] || 'cronos';
+    const newDemo = firstSegment in this.demoClassMap ? firstSegment : 'cronos';
     this.currentDemo.set(newDemo);
     this.clearDemoClasses();
     this.applyDemoClass(this.demoClassMap[newDemo]);
