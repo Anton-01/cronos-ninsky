@@ -1,95 +1,87 @@
-<!-- Modal Backdrop -->
-<div class="fixed inset-0 z-50 flex items-center justify-center">
-  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" (click)="cancelled.emit()"></div>
+<!-- Modal overlay (cc-overlay uses position:fixed from styles.scss) -->
+<div class="cc-overlay">
+  <div class="cc-backdrop" (click)="cancelled.emit()"></div>
 
-  <div class="relative z-10 w-full max-w-lg mx-4">
-    <div class="card shadow-2xl">
+  <div class="cc-modal-sm">
+    <div class="kt-card" style="box-shadow: 0 20px 60px rgba(0,0,0,0.2)">
+
       <!-- Modal Header -->
-      <div class="card-header border-b border-border">
+      <div class="kt-card-header">
         <div class="flex items-center gap-3">
-          <div class="flex items-center justify-center size-10 rounded-lg bg-primary/10">
-            <i class="ki-filled ki-category text-primary text-lg"></i>
+          <div class="flex items-center justify-center rounded-lg bg-primary/10"
+               style="width:40px;height:40px;flex-shrink:0">
+            <i class="ki-filled ki-chart-simple text-primary text-lg"></i>
           </div>
           <div>
-            <h3 class="card-title">{{ isEditing ? 'Editar' : 'Nuevo' }} Tipo de Unidad</h3>
-            <p class="text-xs text-muted-foreground mt-0.5">{{ isEditing ? 'Modifique los datos del registro' : 'Complete los campos para crear un nuevo registro' }}</p>
+            <h3 class="kt-card-title">{{ isEditing ? 'Editar' : 'Nuevo' }} Tipo de Unidad</h3>
+            <p class="kt-card-description">
+              {{ isEditing ? 'Modifique los datos del registro' : 'Complete los campos para crear un nuevo registro' }}
+            </p>
           </div>
         </div>
-        <button (click)="cancelled.emit()" class="kt-btn kt-btn-icon kt-btn-ghost size-8 ms-auto">
+        <button (click)="cancelled.emit()" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost ms-auto">
           <i class="ki-filled ki-cross text-sm"></i>
         </button>
       </div>
 
       <!-- Modal Body -->
-      <div class="card-body">
+      <div class="kt-card-content">
+
+        <!-- API error -->
         @if (errorMessage()) {
-          <div class="flex items-center gap-2 p-3 mb-4 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
-            <i class="ki-filled ki-information-2"></i>
-            <span>{{ errorMessage() }}</span>
+          <div class="kt-alert kt-alert-destructive mb-4">
+            <span class="kt-alert-icon"><i class="ki-filled ki-information-2"></i></span>
+            <div class="kt-alert-content">{{ errorMessage() }}</div>
           </div>
         }
 
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="kt-form">
 
           <!-- Código -->
-          <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-foreground">
-              Código <span class="text-danger">*</span>
+          <div class="kt-form-item">
+            <label class="kt-form-label">
+              Código <span class="text-destructive">*</span>
             </label>
             <input formControlName="codeIdentity" type="text"
               placeholder="Ej: MASS, VOL, TEMP"
-              class="input uppercase"
-              [class.border-danger]="hasError('codeIdentity')" />
-            @if (hasError('codeIdentity')) {
-              <p class="text-xs text-danger flex items-center gap-1">
-                <i class="ki-filled ki-information-2 text-xs"></i>
-                {{ getError('codeIdentity') }}
-              </p>
-            }
+              class="kt-input"
+              style="text-transform:uppercase"
+              [attr.aria-invalid]="hasError('codeIdentity') ? 'true' : null" />
+            <p class="kt-form-message">{{ getError('codeIdentity') }}</p>
           </div>
 
           <!-- Nombre -->
-          <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-foreground">
-              Nombre <span class="text-danger">*</span>
+          <div class="kt-form-item">
+            <label class="kt-form-label">
+              Nombre <span class="text-destructive">*</span>
             </label>
             <input formControlName="name" type="text"
               placeholder="Ej: Masa, Volumen, Temperatura"
-              class="input"
-              [class.border-danger]="hasError('name')" />
-            @if (hasError('name')) {
-              <p class="text-xs text-danger flex items-center gap-1">
-                <i class="ki-filled ki-information-2 text-xs"></i>
-                {{ getError('name') }}
-              </p>
-            }
+              class="kt-input"
+              [attr.aria-invalid]="hasError('name') ? 'true' : null" />
+            <p class="kt-form-message">{{ getError('name') }}</p>
           </div>
 
           <!-- Dimensión -->
-          <div class="flex flex-col gap-1.5">
-            <label class="text-sm font-medium text-foreground">
-              Dimensión <span class="text-danger">*</span>
+          <div class="kt-form-item">
+            <label class="kt-form-label">
+              Dimensión <span class="text-destructive">*</span>
             </label>
             <input formControlName="dimension" type="text"
               placeholder="Ej: M, L, T, Θ"
-              class="input"
-              [class.border-danger]="hasError('dimension')" />
-            @if (hasError('dimension')) {
-              <p class="text-xs text-danger flex items-center gap-1">
-                <i class="ki-filled ki-information-2 text-xs"></i>
-                {{ getError('dimension') }}
-              </p>
-            }
+              class="kt-input"
+              [attr.aria-invalid]="hasError('dimension') ? 'true' : null" />
+            <p class="kt-form-message">{{ getError('dimension') }}</p>
           </div>
 
           <!-- Actions -->
-          <div class="flex items-center justify-end gap-3 pt-2 border-t border-border mt-2">
-            <button type="button" (click)="cancelled.emit()" class="kt-btn kt-btn-outline">
+          <div class="kt-form-actions border-t border-border pt-4 mt-2">
+            <button type="button" (click)="cancelled.emit()" class="kt-btn kt-btn-light">
               Cancelar
             </button>
             <button type="submit" class="kt-btn kt-btn-primary gap-2" [disabled]="isSubmitting()">
               @if (isSubmitting()) {
-                <div class="size-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span class="cc-spinner"></span>
               } @else {
                 <i class="ki-filled ki-check text-sm"></i>
               }

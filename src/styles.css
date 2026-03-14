@@ -1,1 +1,84 @@
 @import "tailwindcss";
+
+/* You can add global styles to this file, and also import other style files */
+
+/* =========================================================
+   Cronos Core — modal overlay (plain CSS, no Tailwind dependency)
+   ========================================================= */
+
+.cc-overlay {
+  position: fixed !important;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cc-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.cc-modal-sm {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 1rem;
+}
+
+.cc-modal-lg {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 40rem;
+  margin: 0 1rem;
+}
+
+.cc-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.cc-form-check-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  transition: background-color 0.15s ease;
+}
+
+.cc-form-check-wrap:hover {
+  background-color: color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+.cc-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 9999px;
+  animation: cc-spin 0.6s linear infinite;
+}
+
+.cc-spinner-muted {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 9999px;
+  animation: cc-spin 0.6s linear infinite;
+}
+
+@keyframes cc-spin {
+  to { transform: rotate(360deg); }
+}

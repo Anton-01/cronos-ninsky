@@ -1,48 +1,49 @@
 <div class="kt-container-fixed">
+
   <!-- Page Header -->
   <div class="flex items-center justify-between py-5">
     <div>
       <h1 class="text-xl font-semibold text-foreground">Tipos de Unidad</h1>
-      <p class="text-sm text-muted-foreground mt-0.5">Gestión del catálogo de tipos de unidad del sistema</p>
+      <p class="text-sm text-muted-foreground mt-1">Gestión del catálogo de tipos de unidad del sistema</p>
     </div>
-    <button (click)="openCreate()"
-      class="kt-btn kt-btn-primary gap-2">
+    <button (click)="openCreate()" class="kt-btn kt-btn-primary gap-2">
       <i class="ki-filled ki-plus-squared text-base"></i>
       Nuevo Tipo de Unidad
     </button>
   </div>
 
-  <!-- Alert -->
+  <!-- Error alert -->
   @if (errorMessage()) {
-    <div class="flex items-center gap-3 p-4 mb-5 rounded-lg bg-danger/10 border border-danger/20 text-danger">
-      <i class="ki-filled ki-information-2 text-lg"></i>
-      <span class="text-sm">{{ errorMessage() }}</span>
+    <div class="kt-alert kt-alert-destructive mb-5">
+      <span class="kt-alert-icon"><i class="ki-filled ki-information-2"></i></span>
+      <div class="kt-alert-content">{{ errorMessage() }}</div>
     </div>
   }
 
   <!-- DataTable Card -->
-  <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">Listado</h3>
-      <div class="card-toolbar">
+  <div class="kt-card">
+    <div class="kt-card-header">
+      <h3 class="kt-card-title">Listado</h3>
+      <div class="kt-card-toolbar">
         <span class="text-sm text-muted-foreground">{{ totalElements() }} registros</span>
       </div>
     </div>
-    <div class="card-body p-0">
+
+    <div class="kt-card-table">
       <!-- Loading -->
       @if (isLoading()) {
         <div class="flex items-center justify-center py-12">
           <div class="flex items-center gap-3 text-muted-foreground">
-            <div class="size-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <span class="cc-spinner-muted"></span>
             <span class="text-sm">Cargando datos...</span>
           </div>
         </div>
       } @else {
-        <div class="table-responsive">
-          <table class="table table-border" data-kt-datatable="true">
+        <div class="kt-table-wrapper">
+          <table class="kt-table kt-table-border">
             <thead>
               <tr>
-                <th class="text-xs font-semibold uppercase text-muted-foreground w-16">#</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground w-14">#</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground">Código</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground">Nombre</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground">Dimensión</th>
@@ -61,22 +62,21 @@
                 </tr>
               }
               @for (item of items(); track item.id; let i = $index) {
-                <tr>
+                <tr class="kt-table-row-hover:bg-accent/50">
                   <td class="text-sm text-muted-foreground">{{ pageRequest.page * pageRequest.size + i + 1 }}</td>
                   <td>
-                    <span class="badge badge-outline badge-sm font-mono">{{ item.codeIdentity }}</span>
+                    <span class="kt-badge kt-badge-stroke kt-badge-sm font-mono">{{ item.codeIdentity }}</span>
                   </td>
                   <td class="text-sm font-medium text-foreground">{{ item.name }}</td>
                   <td class="text-sm text-muted-foreground">{{ item.dimension }}</td>
                   <td class="text-end">
                     <div class="flex items-center justify-end gap-1.5">
                       <button (click)="openEdit(item)"
-                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"
-                        title="Editar">
+                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" title="Editar">
                         <i class="ki-filled ki-pencil text-sm"></i>
                       </button>
                       <button (click)="delete(item)"
-                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline text-danger border-danger/30 hover:bg-danger/10"
+                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light kt-btn-clear-destructive"
                         title="Eliminar">
                         <i class="ki-filled ki-trash text-sm"></i>
                       </button>
@@ -96,20 +96,20 @@
             </span>
             <div class="flex items-center gap-1">
               <button (click)="goToPage(pageRequest.page - 1)" [disabled]="pageRequest.page === 0"
-                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline" [class.opacity-40]="pageRequest.page === 0">
+                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light"
+                [class.opacity-40]="pageRequest.page === 0">
                 <i class="ki-filled ki-left text-xs"></i>
               </button>
               @for (p of pages; track p) {
-                <button (click)="goToPage(p)"
-                  class="kt-btn kt-btn-sm kt-btn-icon"
+                <button (click)="goToPage(p)" class="kt-btn kt-btn-sm kt-btn-icon"
                   [class.kt-btn-primary]="p === pageRequest.page"
-                  [class.kt-btn-outline]="p !== pageRequest.page">
+                  [class.kt-btn-light]="p !== pageRequest.page">
                   {{ p + 1 }}
                 </button>
               }
               <button (click)="goToPage(pageRequest.page + 1)"
                 [disabled]="pageRequest.page >= totalPages() - 1"
-                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline"
+                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light"
                 [class.opacity-40]="pageRequest.page >= totalPages() - 1">
                 <i class="ki-filled ki-right text-xs"></i>
               </button>
