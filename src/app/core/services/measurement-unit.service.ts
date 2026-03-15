@@ -12,7 +12,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class MeasurementUnitService {
-  private readonly API = environment.apiUrl + '/measurementUnit';
+  private readonly API = environment.apiUrl + '/measurementUnit/system';
   private http = inject(HttpClient);
 
   getAll(params: PageRequest): Observable<ApiResponse<Page<MeasurementUnitResponse>>> {
