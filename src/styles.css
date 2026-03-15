@@ -82,3 +82,37 @@
 @keyframes cc-spin {
   to { transform: rotate(360deg); }
 }
+
+/* =========================================================
+   Cronos Core — toast notifications
+   ========================================================= */
+
+.cc-toast-container {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: 22rem;
+  max-width: calc(100vw - 2rem);
+  pointer-events: none;
+}
+
+.cc-toast {
+  pointer-events: all;
+  animation: cc-toast-in 0.25s ease forwards;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+@keyframes cc-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

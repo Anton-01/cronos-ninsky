@@ -3,10 +3,11 @@ import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 
 import { filter } from 'rxjs/operators';
 import { MetronicInitService } from './core/services/metronic-init.service';
+import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
 
 @Component({
   selector: 'body[app-root]',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ToastContainerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

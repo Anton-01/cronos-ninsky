@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CategoryService } from '../../../core/services/category.service';
 import { CategoryResponse } from '../../../core/models/category.model';
+import { CatalogStatus, STATUS_OPTIONS } from '../../../shared/models/status.model';
 
 @Component({
   selector: 'app-category-form',
@@ -15,15 +16,18 @@ export class CategoryFormComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   item = input<CategoryResponse | null>(null);
-  saved = output<void>();
+  saved = output<boolean>();
   cancelled = output<void>();
 
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
 
+  readonly statusOptions = STATUS_OPTIONS;
+
   form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-    description: ['', [Validators.maxLength(255)]]
+    description: ['', [Validators.maxLength(255)]],
+    status: ['ACTIVE' as CatalogStatus]
   });
 
   get isEditing(): boolean {
@@ -33,7 +37,7 @@ export class CategoryFormComponent implements OnInit {
   ngOnInit(): void {
     const current = this.item();
     if (current) {
-      this.form.patchValue({ name: current.name, description: current.description });
+      this.form.patchValue({ name: current.name, description: current.description, status: current.status });
     }
   }
 
@@ -50,9 +54,10 @@ export class CategoryFormComponent implements OnInit {
       this.categoryService.update({
         id: current.id,
         name: this.form.value.name!,
-        description: this.form.value.description || undefined
+        description: this.form.value.description || undefined,
+        status: this.form.value.status as CatalogStatus
       }).subscribe({
-        next: () => { this.isSubmitting.set(false); this.saved.emit(); },
+        next: () => { this.isSubmitting.set(false); this.saved.emit(true); },
         error: (err) => { this.isSubmitting.set(false); this.errorMessage.set(err?.message || 'Error al actualizar'); }
       });
     } else {
@@ -60,7 +65,7 @@ export class CategoryFormComponent implements OnInit {
         name: this.form.value.name!,
         description: this.form.value.description || undefined
       }).subscribe({
-        next: () => { this.isSubmitting.set(false); this.saved.emit(); },
+        next: () => { this.isSubmitting.set(false); this.saved.emit(false); },
         error: (err) => { this.isSubmitting.set(false); this.errorMessage.set(err?.message || 'Error al crear'); }
       });
     }

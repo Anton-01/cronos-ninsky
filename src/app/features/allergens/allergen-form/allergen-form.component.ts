@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { AllergenService } from '../../../core/services/allergen.service';
 import { AllergenResponse } from '../../../core/models/allergen.model';
+import { CatalogStatus, STATUS_OPTIONS } from '../../../shared/models/status.model';
 
 @Component({
   selector: 'app-allergen-form',
@@ -15,16 +16,19 @@ export class AllergenFormComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   item = input<AllergenResponse | null>(null);
-  saved = output<void>();
+  saved = output<boolean>();
   cancelled = output<void>();
 
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
 
+  readonly statusOptions = STATUS_OPTIONS;
+
   form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
     alternativeName: ['', [Validators.maxLength(100)]],
-    description: ['', [Validators.maxLength(500)]]
+    description: ['', [Validators.maxLength(500)]],
+    status: ['ACTIVE' as CatalogStatus]
   });
 
   get isEditing(): boolean {
@@ -37,7 +41,8 @@ export class AllergenFormComponent implements OnInit {
       this.form.patchValue({
         name: current.name,
         alternativeName: current.alternativeName,
-        description: current.description
+        description: current.description,
+        status: current.status
       });
     }
   }
@@ -55,9 +60,10 @@ export class AllergenFormComponent implements OnInit {
       this.allergenService.update({
         id: current.id,
         name: this.form.value.name!,
-        description: this.form.value.description || undefined
+        description: this.form.value.description || undefined,
+        status: this.form.value.status as CatalogStatus
       }).subscribe({
-        next: () => { this.isSubmitting.set(false); this.saved.emit(); },
+        next: () => { this.isSubmitting.set(false); this.saved.emit(true); },
         error: (err) => { this.isSubmitting.set(false); this.errorMessage.set(err?.message || 'Error al actualizar'); }
       });
     } else {
@@ -66,7 +72,7 @@ export class AllergenFormComponent implements OnInit {
         alternativeName: this.form.value.alternativeName || '',
         description: this.form.value.description || undefined
       }).subscribe({
-        next: () => { this.isSubmitting.set(false); this.saved.emit(); },
+        next: () => { this.isSubmitting.set(false); this.saved.emit(false); },
         error: (err) => { this.isSubmitting.set(false); this.errorMessage.set(err?.message || 'Error al crear'); }
       });
     }

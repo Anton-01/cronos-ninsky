@@ -30,6 +30,13 @@
           </div>
         }
 
+        @if (!isEditing) {
+          <div class="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5 mb-4">
+            <i class="ki-filled ki-information-2 text-muted-foreground text-sm mt-0.5 shrink-0"></i>
+            <p class="text-xs text-muted-foreground">El nuevo registro se creará con estado <strong>Activo</strong> de forma predeterminada.</p>
+          </div>
+        }
+
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="kt-form">
 
           <div class="kt-form-item">
@@ -52,6 +59,17 @@
             <p class="kt-form-description">Máximo 255 caracteres</p>
             <p class="kt-form-message">{{ getError('description') }}</p>
           </div>
+
+          @if (isEditing) {
+            <div class="kt-form-item">
+              <label class="kt-form-label">Estado</label>
+              <select formControlName="status" class="kt-input">
+                @for (opt of statusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          }
 
           <div class="kt-form-actions border-t border-border pt-4 mt-2">
             <button type="button" (click)="cancelled.emit()" class="kt-btn kt-btn-light">

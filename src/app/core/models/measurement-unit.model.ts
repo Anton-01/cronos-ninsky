@@ -1,3 +1,5 @@
+import { CatalogStatus } from '../../shared/models/status.model';
+
 export interface MeasurementUnitResponse {
   id: number;
   codeIdentity: string;
@@ -7,6 +9,7 @@ export interface MeasurementUnitResponse {
   multiplierToBase: number;
   isBaseUnit: boolean;
   isSystemDefault: boolean;
+  status: CatalogStatus;
 }
 
 export interface CreateMeasurementUnitRequest {
@@ -28,4 +31,5 @@ export interface UpdateMeasurementUnitRequest {
   multiplierToBase: number;
   isBaseUnit: boolean;
   userId?: number;
+  status?: CatalogStatus;
 }

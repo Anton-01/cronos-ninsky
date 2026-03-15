@@ -5,6 +5,7 @@ import { MeasurementUnitService } from '../../../core/services/measurement-unit.
 import { UnitTypeService } from '../../../core/services/unit-type.service';
 import { MeasurementUnitResponse } from '../../../core/models/measurement-unit.model';
 import { UnitTypeResponse } from '../../../core/models/unit-type.model';
+import { CatalogStatus, STATUS_OPTIONS } from '../../../shared/models/status.model';
 
 @Component({
   selector: 'app-measurement-unit-form',
@@ -18,12 +19,14 @@ export class MeasurementUnitFormComponent implements OnInit {
   private fb = inject(FormBuilder);
 
   item = input<MeasurementUnitResponse | null>(null);
-  saved = output<void>();
+  saved = output<boolean>();
   cancelled = output<void>();
 
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
   unitTypes = signal<UnitTypeResponse[]>([]);
+
+  readonly statusOptions = STATUS_OPTIONS;
 
   form = this.fb.group({
     codeIdentity: ['', [Validators.required, Validators.maxLength(20)]],
@@ -31,7 +34,8 @@ export class MeasurementUnitFormComponent implements OnInit {
     namePlural: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
     unitTypeId: [null as number | null, [Validators.required]],
     multiplierToBase: [1, [Validators.required, Validators.min(0)]],
-    isBaseUnit: [false]
+    isBaseUnit: [false],
+    status: ['ACTIVE' as CatalogStatus]
   });
 
   get isEditing(): boolean {
@@ -47,7 +51,8 @@ export class MeasurementUnitFormComponent implements OnInit {
         name: current.name,
         namePlural: current.namePlural,
         multiplierToBase: current.multiplierToBase,
-        isBaseUnit: current.isBaseUnit
+        isBaseUnit: current.isBaseUnit,
+        status: current.status
       });
     }
   }
@@ -77,9 +82,10 @@ export class MeasurementUnitFormComponent implements OnInit {
         namePlural: v.namePlural!,
         unitTypeId: v.unitTypeId!,
         multiplierToBase: v.multiplierToBase!,
-        isBaseUnit: v.isBaseUnit!
+        isBaseUnit: v.isBaseUnit!,
+        status: v.status as CatalogStatus
       }).subscribe({
-        next: () => { this.isSubmitting.set(false); this.saved.emit(); },
+        next: () => { this.isSubmitting.set(false); this.saved.emit(true); },
         error: (err) => { this.isSubmitting.set(false); this.errorMessage.set(err?.message || 'Error al actualizar'); }
       });
     } else {
@@ -91,7 +97,7 @@ export class MeasurementUnitFormComponent implements OnInit {
         multiplierToBase: v.multiplierToBase!,
         isBaseUnit: v.isBaseUnit!
       }).subscribe({
-        next: () => { this.isSubmitting.set(false); this.saved.emit(); },
+        next: () => { this.isSubmitting.set(false); this.saved.emit(false); },
         error: (err) => { this.isSubmitting.set(false); this.errorMessage.set(err?.message || 'Error al crear'); }
       });
     }

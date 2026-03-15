@@ -1,6 +1,4 @@
 <div class="kt-container-fixed">
-
-  <!-- Page Header -->
   <div class="flex items-center justify-between py-5">
     <div>
       <h1 class="text-xl font-semibold text-foreground">Unidades de Medida</h1>
@@ -12,7 +10,6 @@
     </button>
   </div>
 
-  <!-- Error alert -->
   @if (errorMessage()) {
     <div class="kt-alert kt-alert-destructive mb-5">
       <span class="kt-alert-icon"><i class="ki-filled ki-information-2"></i></span>
@@ -20,7 +17,6 @@
     </div>
   }
 
-  <!-- DataTable Card -->
   <div class="kt-card">
     <div class="kt-card-header">
       <h3 class="kt-card-title">Listado</h3>
@@ -28,7 +24,6 @@
         <span class="text-sm text-muted-foreground">{{ totalElements() }} registros</span>
       </div>
     </div>
-
     <div class="kt-card-table">
       @if (isLoading()) {
         <div class="flex items-center justify-center py-12">
@@ -49,19 +44,18 @@
                 <th class="text-xs font-semibold uppercase text-muted-foreground">Tipo</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground">Factor Base</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground">Base</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Estado</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground text-end">Acciones</th>
               </tr>
             </thead>
             <tbody>
               @if (items().length === 0) {
-                <tr>
-                  <td colspan="8">
-                    <div class="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
-                      <i class="ki-filled ki-folder-up text-3xl"></i>
-                      <span class="text-sm">No hay registros disponibles</span>
-                    </div>
-                  </td>
-                </tr>
+                <tr><td colspan="9">
+                  <div class="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
+                    <i class="ki-filled ki-folder-up text-3xl"></i>
+                    <span class="text-sm">No hay registros disponibles</span>
+                  </div>
+                </td></tr>
               }
               @for (item of items(); track item.id; let i = $index) {
                 <tr>
@@ -80,15 +74,18 @@
                       <span class="kt-badge kt-badge-stroke kt-badge-sm">Derivada</span>
                     }
                   </td>
+                  <td>
+                    <span class="kt-badge kt-badge-sm" [ngClass]="statusBadge[item.status]">
+                      {{ statusLabel[item.status] ?? item.status }}
+                    </span>
+                  </td>
                   <td class="text-end">
                     <div class="flex items-center justify-end gap-1.5">
-                      <button (click)="openEdit(item)"
-                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" title="Editar">
+                      <button (click)="openEdit(item)" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" title="Editar">
                         <i class="ki-filled ki-pencil text-sm"></i>
                       </button>
-                      <button (click)="delete(item)"
-                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light kt-btn-clear-destructive"
-                        title="Eliminar">
+                      <button (click)="openDeleteModal(item)"
+                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light kt-btn-clear-destructive" title="Eliminar">
                         <i class="ki-filled ki-trash text-sm"></i>
                       </button>
                     </div>
@@ -98,29 +95,22 @@
             </tbody>
           </table>
         </div>
-
         @if (totalPages() > 1) {
           <div class="flex items-center justify-between px-5 py-4 border-t border-border">
-            <span class="text-sm text-muted-foreground">
-              Página {{ pageRequest.page + 1 }} de {{ totalPages() }}
-            </span>
+            <span class="text-sm text-muted-foreground">Página {{ pageRequest.page + 1 }} de {{ totalPages() }}</span>
             <div class="flex items-center gap-1">
               <button (click)="goToPage(pageRequest.page - 1)" [disabled]="pageRequest.page === 0"
-                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light"
-                [class.opacity-40]="pageRequest.page === 0">
+                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" [class.opacity-40]="pageRequest.page === 0">
                 <i class="ki-filled ki-left text-xs"></i>
               </button>
               @for (p of pages; track p) {
                 <button (click)="goToPage(p)" class="kt-btn kt-btn-sm kt-btn-icon"
-                  [class.kt-btn-primary]="p === pageRequest.page"
-                  [class.kt-btn-light]="p !== pageRequest.page">
+                  [class.kt-btn-primary]="p === pageRequest.page" [class.kt-btn-light]="p !== pageRequest.page">
                   {{ p + 1 }}
                 </button>
               }
-              <button (click)="goToPage(pageRequest.page + 1)"
-                [disabled]="pageRequest.page >= totalPages() - 1"
-                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light"
-                [class.opacity-40]="pageRequest.page >= totalPages() - 1">
+              <button (click)="goToPage(pageRequest.page + 1)" [disabled]="pageRequest.page >= totalPages() - 1"
+                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" [class.opacity-40]="pageRequest.page >= totalPages() - 1">
                 <i class="ki-filled ki-right text-xs"></i>
               </button>
             </div>
@@ -131,10 +121,17 @@
   </div>
 </div>
 
-@if (showModal()) {
-  <app-measurement-unit-form
-    [item]="selectedItem()"
-    (saved)="onSaved()"
-    (cancelled)="closeModal()">
-  </app-measurement-unit-form>
+@if (showForm()) {
+  <app-measurement-unit-form [item]="selectedItem()" (saved)="onSaved($event)" (cancelled)="closeForm()"></app-measurement-unit-form>
+}
+
+@if (showDeleteModal()) {
+  <app-delete-confirm-modal
+    entityLabel="Unidad de Medida"
+    [entityName]="deletingItem()?.name ?? ''"
+    [details]="deleteDetails()"
+    [isDeleting]="isDeleting()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="closeDeleteModal()">
+  </app-delete-confirm-modal>
 }
