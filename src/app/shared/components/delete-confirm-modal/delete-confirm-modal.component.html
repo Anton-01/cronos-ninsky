@@ -1,0 +1,81 @@
+<div class="cc-overlay">
+  <div class="cc-backdrop" (click)="!isDeleting() && cancelled.emit()"></div>
+
+  <div class="cc-modal-sm">
+    <div class="kt-card" style="box-shadow:0 24px 64px rgba(0,0,0,0.25)">
+
+      <!-- Header with danger accent -->
+      <div class="kt-card-header" style="border-bottom:none;padding-bottom:0">
+        <div class="flex items-center gap-4 w-full">
+          <!-- Icon -->
+          <div class="flex items-center justify-center rounded-full"
+               style="width:52px;height:52px;flex-shrink:0;background:rgba(239,68,68,0.1)">
+            <i class="ki-filled ki-trash text-destructive" style="font-size:1.4rem"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="kt-card-title" style="font-size:1rem">Eliminar {{ entityLabel() }}</h3>
+            <p class="kt-card-description mt-0.5">Esta acción no se puede deshacer</p>
+          </div>
+          <button (click)="!isDeleting() && cancelled.emit()"
+            class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost" [disabled]="isDeleting()"
+            style="flex-shrink:0">
+            <i class="ki-filled ki-cross text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="kt-card-content" style="padding-top:1rem">
+
+        <!-- Warning banner -->
+        <div class="flex items-start gap-3 rounded-lg p-3.5 mb-4"
+             style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18)">
+          <i class="ki-filled ki-information-2 text-destructive" style="font-size:1rem;margin-top:1px;flex-shrink:0"></i>
+          <p class="text-sm" style="color:var(--destructive);line-height:1.5">
+            Estás a punto de eliminar permanentemente
+            <strong class="font-semibold">"{{ entityName() }}"</strong>.
+            Esta acción es irreversible.
+          </p>
+        </div>
+
+        <!-- Detail info card -->
+        @if (details().length > 0) {
+          <div class="kt-card" style="background:var(--muted);border-color:var(--border)">
+            <div class="kt-card-content" style="padding:0.875rem 1rem">
+              <p class="text-xs font-semibold uppercase text-muted-foreground mb-2.5"
+                 style="letter-spacing:0.06em">Información del registro</p>
+              <dl style="display:grid;gap:0.5rem">
+                @for (d of details(); track d.label) {
+                  <div class="flex items-center justify-between gap-4">
+                    <dt class="text-sm text-muted-foreground" style="flex-shrink:0">{{ d.label }}</dt>
+                    <dd class="text-sm font-medium text-foreground text-end">{{ d.value }}</dd>
+                  </div>
+                }
+              </dl>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Footer actions -->
+      <div class="kt-card-footer" style="justify-content:flex-end;gap:0.625rem">
+        <button type="button" (click)="cancelled.emit()"
+          class="kt-btn kt-btn-light" [disabled]="isDeleting()">
+          Cancelar
+        </button>
+        <button type="button" (click)="confirmed.emit()"
+          class="kt-btn gap-2" [disabled]="isDeleting()"
+          style="background-color:var(--destructive);color:var(--destructive-foreground);border-color:var(--destructive)">
+          @if (isDeleting()) {
+            <span class="cc-spinner"></span>
+            Eliminando...
+          } @else {
+            <i class="ki-filled ki-trash text-sm"></i>
+            Sí, eliminar
+          }
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,137 @@
+<div class="kt-container-fixed">
+  <div class="flex items-center justify-between py-5">
+    <div>
+      <h1 class="text-xl font-semibold text-foreground">Unidades de Medida</h1>
+      <p class="text-sm text-muted-foreground mt-1">Gestión del catálogo de unidades de medida del sistema</p>
+    </div>
+    <button (click)="openCreate()" class="kt-btn kt-btn-primary gap-2">
+      <i class="ki-filled ki-plus-squared text-base"></i>
+      Nueva Unidad
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="kt-alert kt-alert-destructive mb-5">
+      <span class="kt-alert-icon"><i class="ki-filled ki-information-2"></i></span>
+      <div class="kt-alert-content">{{ errorMessage() }}</div>
+    </div>
+  }
+
+  <div class="kt-card">
+    <div class="kt-card-header">
+      <h3 class="kt-card-title">Listado</h3>
+      <div class="kt-card-toolbar">
+        <span class="text-sm text-muted-foreground">{{ totalElements() }} registros</span>
+      </div>
+    </div>
+    <div class="kt-card-table">
+      @if (isLoading()) {
+        <div class="flex items-center justify-center py-12">
+          <div class="flex items-center gap-3 text-muted-foreground">
+            <span class="cc-spinner-muted"></span>
+            <span class="text-sm">Cargando datos...</span>
+          </div>
+        </div>
+      } @else {
+        <div class="kt-table-wrapper">
+          <table class="kt-table kt-table-border">
+            <thead>
+              <tr>
+                <th class="text-xs font-semibold uppercase text-muted-foreground w-14">#</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Código</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Nombre</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Plural</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Tipo</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Factor Base</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Base</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Estado</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (items().length === 0) {
+                <tr><td colspan="9">
+                  <div class="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
+                    <i class="ki-filled ki-folder-up text-3xl"></i>
+                    <span class="text-sm">No hay registros disponibles</span>
+                  </div>
+                </td></tr>
+              }
+              @for (item of items(); track item.id; let i = $index) {
+                <tr>
+                  <td class="text-sm text-muted-foreground">{{ pageRequest.page * pageRequest.size + i + 1 }}</td>
+                  <td>
+                    <span class="kt-badge kt-badge-stroke kt-badge-sm" style="font-family:monospace">{{ item.codeIdentity }}</span>
+                  </td>
+                  <td class="text-sm font-medium text-foreground">{{ item.name }}</td>
+                  <td class="text-sm text-muted-foreground">{{ item.namePlural }}</td>
+                  <td class="text-sm text-muted-foreground">{{ item.unitType }}</td>
+                  <td class="text-sm text-foreground" style="font-family:monospace">{{ item.multiplierToBase }}</td>
+                  <td>
+                    @if (item.isBaseUnit) {
+                      <span class="kt-badge kt-badge-primary kt-badge-sm">Base</span>
+                    } @else {
+                      <span class="kt-badge kt-badge-stroke kt-badge-sm">Derivada</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="kt-badge kt-badge-sm" [ngClass]="statusBadge[item.status]">
+                      {{ statusLabel[item.status] ?? item.status }}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <div class="flex items-center justify-end gap-1.5">
+                      <button (click)="openEdit(item)" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" title="Editar">
+                        <i class="ki-filled ki-pencil text-sm"></i>
+                      </button>
+                      <button (click)="openDeleteModal(item)"
+                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light kt-btn-clear-destructive" title="Eliminar">
+                        <i class="ki-filled ki-trash text-sm"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (totalPages() > 1) {
+          <div class="flex items-center justify-between px-5 py-4 border-t border-border">
+            <span class="text-sm text-muted-foreground">Página {{ pageRequest.page + 1 }} de {{ totalPages() }}</span>
+            <div class="flex items-center gap-1">
+              <button (click)="goToPage(pageRequest.page - 1)" [disabled]="pageRequest.page === 0"
+                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" [class.opacity-40]="pageRequest.page === 0">
+                <i class="ki-filled ki-left text-xs"></i>
+              </button>
+              @for (p of pages; track p) {
+                <button (click)="goToPage(p)" class="kt-btn kt-btn-sm kt-btn-icon"
+                  [class.kt-btn-primary]="p === pageRequest.page" [class.kt-btn-light]="p !== pageRequest.page">
+                  {{ p + 1 }}
+                </button>
+              }
+              <button (click)="goToPage(pageRequest.page + 1)" [disabled]="pageRequest.page >= totalPages() - 1"
+                class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" [class.opacity-40]="pageRequest.page >= totalPages() - 1">
+                <i class="ki-filled ki-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+@if (showForm()) {
+  <app-measurement-unit-form [item]="selectedItem()" (saved)="onSaved($event)" (cancelled)="closeForm()"></app-measurement-unit-form>
+}
+
+@if (showDeleteModal()) {
+  <app-delete-confirm-modal
+    entityLabel="Unidad de Medida"
+    [entityName]="deletingItem()?.name ?? ''"
+    [details]="deleteDetails()"
+    [isDeleting]="isDeleting()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="closeDeleteModal()">
+  </app-delete-confirm-modal>
+}

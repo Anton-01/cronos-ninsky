@@ -33,7 +33,7 @@
             ],
             "styles": [
               "src/tailwind.css",
-              "src/styles.scss",
+              "src/styles.css",
               "src/assets/vendors/apexcharts/apexcharts.css",
               "src/assets/vendors/keenicons/styles.bundle.css",
               "src/assets/css/styles.css"
@@ -75,7 +75,8 @@
               "buildTarget": "metronic-tailwind-angular:build:production"
             },
             "development": {
-              "buildTarget": "metronic-tailwind-angular:build:development"
+              "buildTarget": "metronic-tailwind-angular:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
@@ -99,7 +100,7 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.css"
             ],
             "scripts": []
           }

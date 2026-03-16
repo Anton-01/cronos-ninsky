@@ -1,0 +1,29 @@
+<!-- Fixed toast container — top-right, Docker-blue for success, red for errors -->
+<div class="cc-toast-container">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div
+      class="kt-alert cc-toast"
+      [class.kt-alert-primary]="toast.type === 'success'"
+      [class.kt-alert-destructive]="toast.type === 'error'">
+
+      <span class="kt-alert-icon">
+        @if (toast.type === 'success') {
+          <i class="ki-filled ki-shield-tick text-xl"></i>
+        } @else {
+          <i class="ki-filled ki-shield-cross text-xl"></i>
+        }
+      </span>
+
+      <div class="kt-alert-content">
+        <div class="kt-alert-title">{{ toast.title }}</div>
+        @if (toast.message) {
+          <div class="kt-alert-description">{{ toast.message }}</div>
+        }
+      </div>
+
+      <button class="kt-alert-close" (click)="remove(toast.id)" type="button">
+        <i class="ki-filled ki-cross"></i>
+      </button>
+    </div>
+  }
+</div>

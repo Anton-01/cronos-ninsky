@@ -1,0 +1,99 @@
+<div class="cc-overlay">
+  <div class="cc-backdrop" (click)="cancelled.emit()"></div>
+
+  <div class="cc-modal-sm">
+    <div class="kt-card" style="box-shadow: 0 20px 60px rgba(0,0,0,0.2)">
+
+      <div class="kt-card-header">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center rounded-lg"
+               style="width:40px;height:40px;flex-shrink:0;background-color:rgba(var(--warning-rgb, 245,158,11),0.1)">
+            <i class="ki-filled ki-shield-search text-warning text-lg"></i>
+          </div>
+          <div>
+            <h3 class="kt-card-title">{{ isEditing ? 'Editar' : 'Nuevo' }} Alérgeno</h3>
+            <p class="kt-card-description">
+              {{ isEditing ? 'Modifique los datos del registro' : 'Complete los campos para crear un nuevo registro' }}
+            </p>
+          </div>
+        </div>
+        <button (click)="cancelled.emit()" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost ms-auto">
+          <i class="ki-filled ki-cross text-sm"></i>
+        </button>
+      </div>
+
+      <div class="kt-card-content">
+        @if (errorMessage()) {
+          <div class="kt-alert kt-alert-destructive mb-4">
+            <span class="kt-alert-icon"><i class="ki-filled ki-information-2"></i></span>
+            <div class="kt-alert-content">{{ errorMessage() }}</div>
+          </div>
+        }
+
+        @if (!isEditing) {
+          <div class="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5 mb-4">
+            <i class="ki-filled ki-information-2 text-muted-foreground text-sm mt-0.5 shrink-0"></i>
+            <p class="text-xs text-muted-foreground">El nuevo registro se creará con estado <strong>Activo</strong> de forma predeterminada.</p>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="kt-form">
+
+          <div class="kt-form-item">
+            <label class="kt-form-label">
+              Nombre <span class="text-destructive">*</span>
+            </label>
+            <input formControlName="name" type="text"
+              placeholder="Ej: Gluten, Mariscos, Lactosa"
+              class="kt-input"
+              [attr.aria-invalid]="hasError('name') ? 'true' : null" />
+            <p class="kt-form-message">{{ getError('name') }}</p>
+          </div>
+
+          <div class="kt-form-item">
+            <label class="kt-form-label">Nombre Alternativo</label>
+            <input formControlName="alternativeName" type="text"
+              placeholder="Nombre alternativo o sinónimo"
+              class="kt-input"
+              [attr.aria-invalid]="hasError('alternativeName') ? 'true' : null" />
+            <p class="kt-form-message">{{ getError('alternativeName') }}</p>
+          </div>
+
+          <div class="kt-form-item">
+            <label class="kt-form-label">Descripción</label>
+            <textarea formControlName="description" rows="3"
+              placeholder="Descripción del alérgeno y sus efectos"
+              class="kt-input" style="resize:none"
+              [attr.aria-invalid]="hasError('description') ? 'true' : null"></textarea>
+            <p class="kt-form-message">{{ getError('description') }}</p>
+          </div>
+
+          @if (isEditing) {
+            <div class="kt-form-item">
+              <label class="kt-form-label">Estado</label>
+              <select formControlName="status" class="kt-input">
+                @for (opt of statusOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <div class="kt-form-actions border-t border-border pt-4 mt-2">
+            <button type="button" (click)="cancelled.emit()" class="kt-btn kt-btn-light">
+              Cancelar
+            </button>
+            <button type="submit" class="kt-btn kt-btn-primary gap-2" [disabled]="isSubmitting()">
+              @if (isSubmitting()) {
+                <span class="cc-spinner"></span>
+              } @else {
+                <i class="ki-filled ki-check text-sm"></i>
+              }
+              {{ isEditing ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
