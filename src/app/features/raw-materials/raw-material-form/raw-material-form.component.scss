@@ -1,10 +1,234 @@
-// ──────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════
+// Input prefix / suffix helpers
+// (Replaces Tailwind pr-X classes that can't override kt-input)
+// ════════════════════════════════════════════════════════
+
+.rm-input-prefix-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.rm-input-prefix {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  pointer-events: none;
+  z-index: 1;
+  line-height: 1;
+}
+
+// Input inside a prefix wrapper: forced left padding
+.rm-input-has-prefix {
+  padding-left: 1.75rem !important;
+}
+
+// ── Suffix (right side) ──────────────────────────────────
+.rm-input-suffix-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.rm-input-suffix {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  pointer-events: none;
+  z-index: 1;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+// Short suffix (single char like %)
+.rm-input-has-suffix {
+  padding-right: 2rem !important;
+  width: 100%;
+}
+
+// Longer text suffix (g/taza, g/cda, g/cdita)
+.rm-input-has-suffix-lg {
+  padding-right: 4rem !important;
+  width: 100%;
+}
+
+// Text-based suffix label (slightly styled)
+.rm-input-suffix--text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+
+
+// ════════════════════════════════════════════════════════
+// Yield quality pill
+// ════════════════════════════════════════════════════════
+
+.yield-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+
+  &--high {
+    background-color: color-mix(in srgb, var(--success) 15%, transparent);
+    color: var(--success);
+  }
+
+  &--mid {
+    background-color: color-mix(in srgb, var(--warning) 15%, transparent);
+    color: var(--warning);
+  }
+
+  &--low {
+    background-color: color-mix(in srgb, var(--destructive) 12%, transparent);
+    color: var(--destructive);
+  }
+}
+
+
+// ════════════════════════════════════════════════════════
+// Yield tooltip (hover/focus on info button)
+// ════════════════════════════════════════════════════════
+
+.rm-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  &:hover .rm-tooltip,
+  &:focus-within .rm-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.rm-tooltip-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background-color: var(--muted);
+  color: var(--muted-foreground);
+  border: none;
+  cursor: help;
+  transition: background-color 0.15s, color 0.15s;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    color: var(--primary);
+  }
+}
+
+.rm-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  width: 290px;
+  background: #1e293b;
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1e293b;
+  }
+}
+
+
+// ════════════════════════════════════════════════════════
+// Density switch row
+// ════════════════════════════════════════════════════════
+
+.rm-density-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--border);
+  background-color: color-mix(in srgb, var(--muted) 40%, transparent);
+  padding: 0.75rem 1rem;
+}
+
+// Custom toggle switch
+.rm-toggle {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  cursor: pointer;
+  align-items: center;
+  border-radius: 9999px;
+  width: 44px;
+  height: 24px;
+  background-color: var(--muted-foreground);
+  border: none;
+  transition: background-color 0.2s ease;
+
+  &--on {
+    background-color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+.rm-toggle__thumb {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translateX(3px);
+  transition: transform 0.2s ease;
+
+  &--on {
+    transform: translateX(23px);
+  }
+}
+
+
+// ════════════════════════════════════════════════════════
 // Live Cost Summary Card
-// ──────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════
+
 .cost-summary-card {
-  border-radius: var(--radius-lg, 0.75rem);
+  border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border);
 
   &__header {
@@ -12,7 +236,11 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.875rem 1.25rem;
-    background: linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 80%, var(--primary-foreground)) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      color-mix(in srgb, var(--primary) 70%, #000) 100%
+    );
     color: var(--primary-foreground);
   }
 
@@ -95,81 +323,63 @@
   }
 }
 
-// ──────────────────────────────────────────────────────
-// Yield quality pill
-// ──────────────────────────────────────────────────────
-.yield-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.25rem 0.625rem;
-  border-radius: 999px;
-  white-space: nowrap;
-  transition: all 0.2s ease;
 
-  &--high {
-    background-color: color-mix(in srgb, var(--success) 15%, transparent);
-    color: var(--success);
+// ════════════════════════════════════════════════════════
+// Density Summary Card (right column, shown after saving)
+// ════════════════════════════════════════════════════════
+
+.density-summary-card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: color-mix(in srgb, var(--primary) 10%, var(--card));
+    color: var(--primary);
+    border-bottom: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+    font-size: 0.8125rem;
   }
 
-  &--mid {
-    background-color: color-mix(in srgb, var(--warning) 15%, transparent);
-    color: var(--warning);
+  &__body {
+    padding: 1rem;
+    background: var(--card);
   }
 
-  &--low {
-    background-color: color-mix(in srgb, var(--destructive) 12%, transparent);
-    color: var(--destructive);
+  &__note {
+    font-size: 0.72rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.875rem;
+    line-height: 1.5;
   }
-}
 
-// ──────────────────────────────────────────────────────
-// Yield tooltip
-// ──────────────────────────────────────────────────────
-.group {
-  &:hover .cc-tooltip-yield,
-  &:focus-within .cc-tooltip-yield {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+  &__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
   }
-}
 
-.cc-tooltip-yield {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  width: 280px;
-  background: #1e293b;
-  color: #e2e8f0;
-  font-size: 0.72rem;
-  line-height: 1.5;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  z-index: 9999;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  pointer-events: none;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: #1e293b;
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.375rem;
+    background: color-mix(in srgb, var(--primary) 6%, transparent);
   }
-}
 
-// ──────────────────────────────────────────────────────
-// Input pl-7 (icon prefix)
-// ──────────────────────────────────────────────────────
-.kt-input.pl-7 {
-  padding-left: 1.75rem;
+  &__measure {
+    color: var(--muted-foreground);
+  }
+
+  &__value {
+    font-weight: 700;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+  }
 }
