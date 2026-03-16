@@ -1,0 +1,528 @@
+<div class="kt-container-fixed pb-10">
+
+  <!-- Page Header -->
+  <div class="flex items-center gap-3 py-5">
+    <a routerLink="/cronos/ingredientes" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" title="Volver al listado">
+      <i class="ki-filled ki-arrow-left text-sm"></i>
+    </a>
+    <div>
+      <h1 class="text-xl font-semibold text-foreground">
+        {{ isEditing() ? 'Editar Ingrediente' : 'Nuevo Ingrediente' }}
+      </h1>
+      <p class="text-sm text-muted-foreground mt-0.5">
+        {{ isEditing() ? 'Modifica los datos del ingrediente' : 'Completa los campos para registrar un nuevo ingrediente' }}
+      </p>
+    </div>
+  </div>
+
+  @if (isLoadingData() && isEditing()) {
+    <div class="flex items-center justify-center py-20">
+      <div class="flex items-center gap-3 text-muted-foreground">
+        <span class="cc-spinner-muted"></span>
+        <span class="text-sm">Cargando datos del ingrediente...</span>
+      </div>
+    </div>
+  } @else {
+
+    @if (errorMessage()) {
+      <div class="kt-alert kt-alert-destructive mb-5">
+        <span class="kt-alert-icon"><i class="ki-filled ki-information-2"></i></span>
+        <div class="kt-alert-content">{{ errorMessage() }}</div>
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- LEFT COLUMN: Main form                   -->
+        <!-- ══════════════════════════════════════════ -->
+        <div class="lg:col-span-2 flex flex-col gap-5">
+
+          <!-- Basic Info Card -->
+          <div class="kt-card">
+            <div class="kt-card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 shrink-0">
+                  <i class="ki-filled ki-basket text-primary text-base"></i>
+                </div>
+                <div>
+                  <h3 class="kt-card-title">Información General</h3>
+                  <p class="kt-card-description">Datos principales del ingrediente</p>
+                </div>
+              </div>
+            </div>
+            <div class="kt-card-content">
+
+              <!-- Nombre -->
+              <div class="kt-form-item" [class.has-error]="hasError('name')">
+                <label class="kt-form-label">
+                  Nombre <span class="text-destructive">*</span>
+                </label>
+                <input formControlName="name" type="text"
+                  placeholder="Ej: Harina de trigo, Azúcar refinada, Tomate"
+                  class="kt-input"
+                  [class.border-destructive]="hasError('name')"
+                  [attr.aria-invalid]="hasError('name') ? 'true' : null" />
+                @if (hasError('name')) {
+                  <p class="kt-form-message text-destructive">{{ getError('name') }}</p>
+                }
+              </div>
+
+              <!-- Categoría + Marca (grid) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="kt-form-item" [class.has-error]="hasError('categoryId')">
+                  <label class="kt-form-label">
+                    Categoría <span class="text-destructive">*</span>
+                  </label>
+                  <select formControlName="categoryId" class="kt-input"
+                    [class.border-destructive]="hasError('categoryId')">
+                    <option [ngValue]="null" disabled>Selecciona una categoría</option>
+                    @for (cat of categories(); track cat.id) {
+                      <option [ngValue]="cat.id">{{ cat.name }}</option>
+                    }
+                  </select>
+                  @if (hasError('categoryId')) {
+                    <p class="kt-form-message text-destructive">{{ getError('categoryId') }}</p>
+                  }
+                </div>
+
+                <div class="kt-form-item">
+                  <label class="kt-form-label">Marca</label>
+                  <input formControlName="brand" type="text"
+                    placeholder="Ej: Maseca, Del Monte, La Costeña"
+                    class="kt-input"
+                    [class.border-destructive]="hasError('brand')" />
+                  @if (hasError('brand')) {
+                    <p class="kt-form-message text-destructive">{{ getError('brand') }}</p>
+                  }
+                </div>
+              </div>
+
+              <!-- Proveedor -->
+              <div class="kt-form-item">
+                <label class="kt-form-label">Proveedor</label>
+                <input formControlName="supplier" type="text"
+                  placeholder="Nombre del proveedor o distribuidor"
+                  class="kt-input"
+                  [class.border-destructive]="hasError('supplier')" />
+                @if (hasError('supplier')) {
+                  <p class="kt-form-message text-destructive">{{ getError('supplier') }}</p>
+                }
+              </div>
+
+              <!-- Descripción -->
+              <div class="kt-form-item">
+                <label class="kt-form-label">Descripción</label>
+                <textarea formControlName="description" rows="3"
+                  placeholder="Notas adicionales sobre el ingrediente (tipo, variedad, calidad, etc.)"
+                  class="kt-input" style="resize:none"
+                  [class.border-destructive]="hasError('description')"></textarea>
+                @if (hasError('description')) {
+                  <p class="kt-form-message text-destructive">{{ getError('description') }}</p>
+                }
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Purchase & Costing Card -->
+          <div class="kt-card">
+            <div class="kt-card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-warning/10 shrink-0">
+                  <i class="ki-filled ki-dollar text-warning text-base"></i>
+                </div>
+                <div>
+                  <h3 class="kt-card-title">Compra y Costeo</h3>
+                  <p class="kt-card-description">Define cómo compras y a qué costo</p>
+                </div>
+              </div>
+            </div>
+            <div class="kt-card-content">
+
+              <!-- Unidad de Compra + Cantidad -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="kt-form-item" [class.has-error]="hasError('purchaseUnitId')">
+                  <label class="kt-form-label">
+                    Unidad de Compra <span class="text-destructive">*</span>
+                  </label>
+                  <select formControlName="purchaseUnitId" class="kt-input"
+                    [class.border-destructive]="hasError('purchaseUnitId')">
+                    <option [ngValue]="null" disabled>Selecciona una unidad</option>
+                    @for (unit of measurementUnits(); track unit.id) {
+                      <option [ngValue]="unit.id">{{ unit.name }} ({{ unit.codeIdentity }})</option>
+                    }
+                  </select>
+                  @if (hasError('purchaseUnitId')) {
+                    <p class="kt-form-message text-destructive">{{ getError('purchaseUnitId') }}</p>
+                  }
+                </div>
+
+                <div class="kt-form-item" [class.has-error]="hasError('quantity')">
+                  <label class="kt-form-label">
+                    Cantidad <span class="text-destructive">*</span>
+                  </label>
+                  <input formControlName="quantity" type="number" min="0.0001" step="0.01"
+                    placeholder="Ej: 1, 500, 2.5"
+                    class="kt-input"
+                    [class.border-destructive]="hasError('quantity')" />
+                  @if (hasError('quantity')) {
+                    <p class="kt-form-message text-destructive">{{ getError('quantity') }}</p>
+                  }
+                </div>
+              </div>
+
+              <!-- Costo + Moneda -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="kt-form-item" [class.has-error]="hasError('cost')">
+                  <label class="kt-form-label">
+                    Costo de Compra <span class="text-destructive">*</span>
+                  </label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">$</span>
+                    <input formControlName="cost" type="number" min="0" step="0.01"
+                      placeholder="0.00"
+                      class="kt-input pl-7"
+                      [class.border-destructive]="hasError('cost')" />
+                  </div>
+                  @if (hasError('cost')) {
+                    <p class="kt-form-message text-destructive">{{ getError('cost') }}</p>
+                  }
+                </div>
+
+                <div class="kt-form-item" [class.has-error]="hasError('currency')">
+                  <label class="kt-form-label">
+                    Moneda <span class="text-destructive">*</span>
+                  </label>
+                  <select formControlName="currency" class="kt-input"
+                    [class.border-destructive]="hasError('currency')">
+                    @for (cur of currencyOptions; track cur.value) {
+                      <option [value]="cur.value">{{ cur.label }}</option>
+                    }
+                  </select>
+                  @if (hasError('currency')) {
+                    <p class="kt-form-message text-destructive">{{ getError('currency') }}</p>
+                  }
+                </div>
+              </div>
+
+              <!-- Rendimiento (Merma) -->
+              <div class="kt-form-item" [class.has-error]="hasError('yieldPercent')">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <label class="kt-form-label mb-0">
+                    % de Rendimiento (Merma) <span class="text-destructive">*</span>
+                  </label>
+                  <div class="group relative flex items-center">
+                    <button type="button"
+                      class="flex items-center justify-center w-4 h-4 rounded-full bg-muted text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors cursor-help"
+                      title="Información sobre el rendimiento">
+                      <i class="ki-filled ki-information-2 text-[10px]"></i>
+                    </button>
+                    <div class="cc-tooltip-yield">
+                      <p class="font-medium mb-1">¿Qué es el rendimiento?</p>
+                      <p>Es el porcentaje del ingrediente que realmente puedes usar después de limpiarlo o prepararlo.</p>
+                      <p class="mt-1.5 text-yellow-300/90">
+                        <strong>Ejemplo:</strong> Si compras 1 Kg de fresas pero le quitas 150g de tallos y partes dañadas,
+                        solo aprovechas 850g → tu rendimiento es del <strong>85%</strong>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <div class="relative flex-1">
+                    <input formControlName="yieldPercent" type="number" min="1" max="100" step="0.1"
+                      placeholder="100"
+                      class="kt-input pr-8"
+                      [class.border-destructive]="hasError('yieldPercent')"
+                      [class.border-warning]="yieldValue < 70 && yieldValue >= 1" />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">%</span>
+                  </div>
+                  <!-- Yield visual pill -->
+                  <div class="yield-pill shrink-0"
+                    [class.yield-pill--high]="yieldValue >= 90"
+                    [class.yield-pill--mid]="yieldValue >= 70 && yieldValue < 90"
+                    [class.yield-pill--low]="yieldValue < 70">
+                    @if (yieldValue >= 90) {
+                      <i class="ki-filled ki-check-circle text-xs"></i> Excelente
+                    } @else if (yieldValue >= 70) {
+                      <i class="ki-filled ki-information-2 text-xs"></i> Moderado
+                    } @else {
+                      <i class="ki-filled ki-warning-2 text-xs"></i> Alto desperdicio
+                    }
+                  </div>
+                </div>
+
+                @if (hasError('yieldPercent')) {
+                  <p class="kt-form-message text-destructive">{{ getError('yieldPercent') }}</p>
+                }
+              </div>
+
+              <!-- Density switch (only for weight/mass units) -->
+              @if (showDensitySwitch()) {
+                <div class="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3 mt-2">
+                  <div class="flex items-start gap-3">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 shrink-0 mt-0.5">
+                      <i class="ki-filled ki-cup text-primary text-sm"></i>
+                    </div>
+                    <div>
+                      <p class="text-sm font-medium text-foreground">¿Usarás este ingrediente con tazas o cucharadas?</p>
+                      <p class="text-xs text-muted-foreground mt-0.5">Activa para definir cuántos gramos equivalen a medidas volumétricas</p>
+                    </div>
+                  </div>
+                  <button type="button" (click)="toggleDensity()"
+                    class="relative inline-flex shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 focus:outline-none"
+                    style="width:44px;height:24px;"
+                    [style.background]="densityEnabled() ? 'var(--primary)' : 'var(--muted-foreground)'">
+                    <span class="inline-block w-5 h-5 transform rounded-full bg-white shadow transition-transform duration-200"
+                      [style.transform]="densityEnabled() ? 'translateX(22px)' : 'translateX(2px)'">
+                    </span>
+                  </button>
+                </div>
+              }
+
+            </div>
+          </div>
+
+          <!-- Stock & Status -->
+          <div class="kt-card">
+            <div class="kt-card-header">
+              <div class="flex items-center gap-2.5">
+                <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-success/10 shrink-0">
+                  <i class="ki-filled ki-chart-line-down text-success text-base"></i>
+                </div>
+                <div>
+                  <h3 class="kt-card-title">Stock y Estado</h3>
+                  <p class="kt-card-description">Control de inventario y disponibilidad</p>
+                </div>
+              </div>
+            </div>
+            <div class="kt-card-content">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="kt-form-item">
+                  <label class="kt-form-label">Stock Mínimo</label>
+                  <input formControlName="minimumStock" type="number" min="0" step="0.01"
+                    placeholder="Ej: 5 (en la unidad de compra)"
+                    class="kt-input"
+                    [class.border-destructive]="hasError('minimumStock')" />
+                  @if (hasError('minimumStock')) {
+                    <p class="kt-form-message text-destructive">{{ getError('minimumStock') }}</p>
+                  }
+                  <p class="text-xs text-muted-foreground mt-1">Se usará para alertas de reabastecimiento</p>
+                </div>
+
+                @if (isEditing()) {
+                  <div class="kt-form-item">
+                    <label class="kt-form-label">Estado</label>
+                    <select formControlName="status" class="kt-input">
+                      @for (opt of statusOptions; track opt.value) {
+                        <option [value]="opt.value">{{ opt.label }}</option>
+                      }
+                    </select>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ══════════════════════════════════════════ -->
+        <!-- RIGHT COLUMN: Summary + Actions           -->
+        <!-- ══════════════════════════════════════════ -->
+        <div class="flex flex-col gap-5">
+
+          <!-- Live Cost Summary Card -->
+          <div class="cost-summary-card">
+            <div class="cost-summary-card__header">
+              <i class="ki-filled ki-calculator text-base"></i>
+              <span class="font-semibold text-sm">Resumen de Costo</span>
+              <span class="text-xs opacity-70 ms-auto">Cálculo en vivo</span>
+            </div>
+            <div class="cost-summary-card__body">
+
+              @if (costSummary()) {
+                <div class="cost-summary-card__result">
+                  <p class="cost-summary-card__label">Costo real utilizable</p>
+                  <p class="cost-summary-card__value">
+                    {{ costSummary()!.currency }}
+                    <span class="cost-summary-card__amount">
+                      {{ costSummary()!.realCost | number:'1.4-4' }}
+                    </span>
+                  </p>
+                  <p class="cost-summary-card__sub">por cada {{ costSummary()!.unitName }}</p>
+                </div>
+
+                <div class="cost-summary-card__breakdown">
+                  <div class="cost-summary-card__row">
+                    <span>Costo de compra</span>
+                    <span class="font-medium">{{ form.get('currency')?.value }} {{ costValue | number:'1.2-2' }}</span>
+                  </div>
+                  <div class="cost-summary-card__row">
+                    <span>Cantidad comprada</span>
+                    <span class="font-medium">{{ quantityValue }} {{ selectedUnit?.codeIdentity ?? '' }}</span>
+                  </div>
+                  <div class="cost-summary-card__row">
+                    <span>Rendimiento aplicado</span>
+                    <span class="font-medium">{{ yieldValue }}%</span>
+                  </div>
+                  <div class="cost-summary-card__divider"></div>
+                  <div class="cost-summary-card__row cost-summary-card__row--total">
+                    <span>Cantidad utilizable</span>
+                    <span>{{ (quantityValue * yieldValue / 100) | number:'1.4-4' }} {{ selectedUnit?.codeIdentity ?? '' }}</span>
+                  </div>
+                </div>
+
+              } @else {
+                <div class="cost-summary-card__empty">
+                  <i class="ki-filled ki-calculator text-2xl opacity-30"></i>
+                  <p class="text-xs text-center opacity-60 mt-2">
+                    Ingresa el costo, cantidad y<br>rendimiento para ver el cálculo
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Info Tips Card -->
+          <div class="kt-card">
+            <div class="kt-card-content py-4">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-start gap-2.5">
+                  <i class="ki-filled ki-information-2 text-primary text-sm mt-0.5 shrink-0"></i>
+                  <p class="text-xs text-muted-foreground">
+                    <strong class="text-foreground">Rendimiento al 100%</strong> significa que usas el ingrediente completo sin ninguna pérdida.
+                  </p>
+                </div>
+                <div class="flex items-start gap-2.5">
+                  <i class="ki-filled ki-information-2 text-warning text-sm mt-0.5 shrink-0"></i>
+                  <p class="text-xs text-muted-foreground">
+                    <strong class="text-foreground">Rendimiento menor</strong> a 80% indica alto desperdicio. Considera revisar el proceso de preparación.
+                  </p>
+                </div>
+                <div class="flex items-start gap-2.5">
+                  <i class="ki-filled ki-information-2 text-success text-sm mt-0.5 shrink-0"></i>
+                  <p class="text-xs text-muted-foreground">
+                    El <strong class="text-foreground">costo real</strong> que ves en el resumen es el que se usará en el coste de tus recetas.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col gap-2.5">
+            <button type="submit" class="kt-btn kt-btn-primary gap-2 w-full justify-center"
+              [disabled]="isSubmitting()">
+              @if (isSubmitting()) {
+                <span class="cc-spinner"></span>
+                Guardando...
+              } @else {
+                <i class="ki-filled ki-check text-sm"></i>
+                {{ isEditing() ? 'Actualizar Ingrediente' : 'Crear Ingrediente' }}
+              }
+            </button>
+            <a routerLink="/cronos/ingredientes" class="kt-btn kt-btn-light gap-2 w-full justify-center">
+              <i class="ki-filled ki-cross text-sm"></i>
+              Cancelar
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </form>
+  }
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- DENSITY CONVERSION MODAL                              -->
+<!-- ══════════════════════════════════════════════════════ -->
+@if (showDensityModal()) {
+  <div class="cc-overlay">
+    <div class="cc-backdrop" (click)="closeDensityModal()"></div>
+    <div class="cc-modal-sm">
+      <div class="kt-card" style="box-shadow: 0 20px 60px rgba(0,0,0,0.2)">
+
+        <div class="kt-card-header">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center rounded-lg bg-primary/10"
+                 style="width:40px;height:40px;flex-shrink:0">
+              <i class="ki-filled ki-cup text-primary text-lg"></i>
+            </div>
+            <div>
+              <h3 class="kt-card-title">Conversión de Densidad</h3>
+              <p class="kt-card-description">Define equivalencias en medidas volumétricas</p>
+            </div>
+          </div>
+          <button type="button" (click)="closeDensityModal()" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost ms-auto">
+            <i class="ki-filled ki-cross text-sm"></i>
+          </button>
+        </div>
+
+        <div class="kt-card-content">
+          <div class="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5 mb-4">
+            <i class="ki-filled ki-information-2 text-primary text-sm mt-0.5 shrink-0"></i>
+            <p class="text-xs text-muted-foreground">
+              Esta información permite que Cronos convierta automáticamente entre <strong>gramos</strong> y <strong>medidas volumétricas</strong> (tazas, cucharadas) en tus recetas. Puedes obtener este dato pesando literalmente 1 taza del ingrediente en tu cocina.
+            </p>
+          </div>
+
+          <form [formGroup]="form" class="kt-form">
+            <!-- Gramos por taza (required for density) -->
+            <div class="kt-form-item" [class.has-error]="hasError('gramsPerCup')">
+              <label class="kt-form-label">
+                Gramos por 1 taza (240ml) <span class="text-destructive">*</span>
+              </label>
+              <div class="relative">
+                <input formControlName="gramsPerCup" type="number" min="1" max="5000" step="0.1"
+                  placeholder="Ej: 125 (harina), 200 (azúcar), 240 (agua)"
+                  class="kt-input pr-10"
+                  [class.border-destructive]="hasError('gramsPerCup')" />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">g/taza</span>
+              </div>
+              @if (hasError('gramsPerCup')) {
+                <p class="kt-form-message text-destructive">{{ getError('gramsPerCup') }}</p>
+              }
+            </div>
+
+            <!-- Gramos por cucharada -->
+            <div class="kt-form-item">
+              <label class="kt-form-label">Gramos por 1 cucharada (15ml) <span class="text-muted-foreground text-xs">(opcional)</span></label>
+              <div class="relative">
+                <input formControlName="gramsPerTablespoon" type="number" min="1" max="1000" step="0.1"
+                  placeholder="Ej: 10 (harina), 12 (azúcar), 15 (aceite)"
+                  class="kt-input pr-16"
+                  [class.border-destructive]="hasError('gramsPerTablespoon')" />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">g/cda</span>
+              </div>
+            </div>
+
+            <!-- Gramos por cucharadita -->
+            <div class="kt-form-item">
+              <label class="kt-form-label">Gramos por 1 cucharadita (5ml) <span class="text-muted-foreground text-xs">(opcional)</span></label>
+              <div class="relative">
+                <input formControlName="gramsPerTeaspoon" type="number" min="1" max="500" step="0.1"
+                  placeholder="Ej: 3 (harina), 4 (azúcar), 5 (sal)"
+                  class="kt-input pr-16"
+                  [class.border-destructive]="hasError('gramsPerTeaspoon')" />
+                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs pointer-events-none">g/cdita</span>
+              </div>
+            </div>
+
+            <div class="kt-form-actions border-t border-border pt-4 mt-2">
+              <button type="button" (click)="closeDensityModal()" class="kt-btn kt-btn-light">
+                Cancelar
+              </button>
+              <button type="button" (click)="saveDensityModal()" class="kt-btn kt-btn-primary gap-2">
+                <i class="ki-filled ki-check text-sm"></i>
+                Guardar Conversión
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}
