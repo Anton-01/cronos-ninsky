@@ -92,7 +92,7 @@ export class RawMaterialListComponent implements OnInit {
   get pages(): number[] { return Array.from({ length: this.totalPages() }, (_, i) => i); }
 
   formatCost(item: RawMaterialResponse): string {
-    const realCost = item.cost / (item.quantity * (item.yieldPercent / 100));
+    const realCost = item.unitCost / (item.purchaseQuantity * (item.yieldPercentage / 100));
     return realCost.toFixed(4);
   }
 }

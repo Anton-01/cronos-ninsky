@@ -157,12 +157,12 @@
                     <label class="kt-form-label">
                       Cantidad <span class="text-destructive">*</span>
                     </label>
-                    <input formControlName="quantity" type="number" min="0.0001" step="0.01"
+                    <input formControlName="purchaseQuantity" type="number" min="0.0001" step="0.01"
                       placeholder="Ej: 1, 500, 2.5"
                       class="kt-input"
-                      [attr.aria-invalid]="hasError('quantity') ? 'true' : null"
+                      [attr.aria-invalid]="hasError('purchaseQuantity') ? 'true' : null"
                       (blur)="updateCostSummary()" />
-                    <p class="kt-form-message">{{ getError('quantity') }}</p>
+                    <p class="kt-form-message">{{ getError('purchaseQuantity') }}</p>
                   </div>
                 </div>
 
@@ -175,13 +175,13 @@
                     <!-- Prefix wrapper: uses relative + inline padding-left on input -->
                     <div class="rm-input-prefix-wrap">
                       <span class="rm-input-prefix">$</span>
-                      <input formControlName="cost" type="number" min="0" step="0.01"
+                      <input formControlName="unitCost" type="number" min="0" step="0.01"
                         placeholder="0.00"
                         class="kt-input rm-input-has-prefix"
-                        [attr.aria-invalid]="hasError('cost') ? 'true' : null"
+                        [attr.aria-invalid]="hasError('unitCost') ? 'true' : null"
                         (blur)="updateCostSummary()" />
                     </div>
-                    <p class="kt-form-message">{{ getError('cost') }}</p>
+                    <p class="kt-form-message">{{ getError('unitCost') }}</p>
                   </div>
 
                   <div class="kt-form-item">
@@ -223,10 +223,10 @@
                   <div class="flex items-center gap-3">
                     <!-- Input con sufijo % -->
                     <div class="rm-input-suffix-wrap flex-1">
-                      <input formControlName="yieldPercent" type="number" min="1" max="100" step="0.1"
+                      <input formControlName="yieldPercentage" type="number" min="1" max="100" step="0.1"
                         placeholder="100"
                         class="kt-input rm-input-has-suffix"
-                        [attr.aria-invalid]="hasError('yieldPercent') ? 'true' : null"
+                        [attr.aria-invalid]="hasError('yieldPercentage') ? 'true' : null"
                         (blur)="updateCostSummary()" />
                       <span class="rm-input-suffix">%</span>
                     </div>
@@ -244,7 +244,7 @@
                       }
                     </div>
                   </div>
-                  <p class="kt-form-message">{{ getError('yieldPercent') }}</p>
+                  <p class="kt-form-message">{{ getError('yieldPercentage') }}</p>
                 </div>
 
                 <!-- Switch de densidad (solo para unidades de peso/masa) -->

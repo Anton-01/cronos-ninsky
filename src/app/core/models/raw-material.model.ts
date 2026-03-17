@@ -12,10 +12,10 @@ export interface RawMaterialResponse {
   purchaseUnitName: string;
   purchaseUnitCode: string;
   purchaseUnitType: string;
-  quantity: number;
-  cost: number;
+  purchaseQuantity: number;
+  unitCost: number;
   currency: string;
-  yieldPercent: number;
+  yieldPercentage: number;
   minimumStock?: number;
   hasDensityConversion: boolean;
   status: CatalogStatus;
@@ -28,16 +28,16 @@ export interface CreateRawMaterialRequest {
   supplier?: string;
   categoryId: number;
   purchaseUnitId: number;
-  quantity: number;
-  cost: number;
+  purchaseQuantity: number;
+  unitCost: number;
   currency: string;
-  yieldPercent: number;
+  yieldPercentage: number;
   minimumStock?: number;
   densityConversion?: DensityConversionRequest;
 }
 
 export interface UpdateRawMaterialRequest extends CreateRawMaterialRequest {
-  id: number;
+  id: string;
   status?: CatalogStatus;
 }
 

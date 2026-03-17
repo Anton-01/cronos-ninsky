@@ -78,16 +78,16 @@
                   <td>
                     <span class="kt-badge kt-badge-stroke kt-badge-sm">{{ item.purchaseUnitCode }}</span>
                   </td>
-                  <td class="text-sm text-end text-muted-foreground">{{ item.quantity }}</td>
+                  <td class="text-sm text-end text-muted-foreground">{{ item.purchaseQuantity }}</td>
                   <td class="text-sm text-end font-medium text-foreground">
-                    {{ item.currency }} {{ item.cost | number:'1.2-2' }}
+                    {{ item.currency }} {{ item.unitCost | number:'1.2-2' }}
                   </td>
                   <td class="text-end">
                     <span class="text-sm font-medium"
-                      [class.text-success]="item.yieldPercent >= 90"
-                      [class.text-warning]="item.yieldPercent >= 70 && item.yieldPercent < 90"
-                      [class.text-destructive]="item.yieldPercent < 70">
-                      {{ item.yieldPercent }}%
+                      [class.text-success]="item.yieldPercentage >= 90"
+                      [class.text-warning]="item.yieldPercentage >= 70 && item.yieldPercentage < 90"
+                      [class.text-destructive]="item.yieldPercentage < 70">
+                      {{ item.yieldPercentage }}%
                     </span>
                   </td>
                   <td class="text-sm text-end font-semibold text-primary">
@@ -95,7 +95,7 @@
                   </td>
                   <td>
                     <span class="kt-badge kt-badge-sm" [ngClass]="statusBadge[item.status]">
-                      {{ statusLabel[item.status] ?? item.status }}
+                      {{ statusLabel[item.status] }}
                     </span>
                   </td>
                   <td class="text-end">

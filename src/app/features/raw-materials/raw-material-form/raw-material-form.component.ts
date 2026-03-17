@@ -38,7 +38,7 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
 
   // ─── State ───────────────────────────────────────────
   isEditing = signal(false);
-  editingId = signal<number | null>(null);
+  editingId = signal<string | null>(null);
   isSubmitting = signal(false);
   isLoadingData = signal(false);
   errorMessage = signal<string | null>(null);
@@ -66,10 +66,10 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
     name:           ['', [Validators.required, Validators.minLength(2), Validators.maxLength(150)]],
     categoryId:     [null as number | null, [Validators.required]],
     purchaseUnitId: [null as number | null, [Validators.required]],
-    quantity:       [null as number | null, [Validators.required, Validators.min(0.0001)]],
-    cost:           [null as number | null, [Validators.required, Validators.min(0)]],
+    purchaseQuantity:       [null as number | null, [Validators.required, Validators.min(0.0001)]],
+    unitCost:           [null as number | null, [Validators.required, Validators.min(0)]],
     currency:       ['MXN', [Validators.required]],
-    yieldPercent:   [100, [Validators.required, Validators.min(1), Validators.max(100)]],
+    yieldPercentage:   [100, [Validators.required, Validators.min(1), Validators.max(100)]],
     // Optional
     description:    ['', [Validators.maxLength(500)]],
     brand:          ['', [Validators.maxLength(100)]],
@@ -89,9 +89,9 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
     return this.measurementUnits().find(u => u.id === id);
   }
 
-  get yieldValue(): number  { return this.form.get('yieldPercent')?.value ?? 100; }
-  get costValue(): number   { return this.form.get('cost')?.value ?? 0; }
-  get quantityValue(): number { return this.form.get('quantity')?.value ?? 0; }
+  get yieldValue(): number  { return this.form.get('yieldPercentage')?.value ?? 100; }
+  get costValue(): number   { return this.form.get('unitCost')?.value ?? 0; }
+  get quantityValue(): number { return this.form.get('purchaseQuantity')?.value ?? 0; }
 
   // ─── Lifecycle ───────────────────────────────────────
   ngOnInit(): void {
@@ -100,10 +100,10 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
     this.setupUnitWatcher();
 
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    if (id && id !== 'null') {
       this.isEditing.set(true);
-      this.editingId.set(Number(id));
-      this.loadItem(Number(id));
+      this.editingId.set(id);
+      this.loadItem(id);
     }
   }
 
@@ -131,7 +131,7 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadItem(id: number): void {
+  private loadItem(id: string): void {
     this.rawMaterialService.getById(id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (res) => {
         const item: RawMaterialResponse = res.data;
@@ -139,10 +139,10 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
           name:           item.name,
           categoryId:     item.categoryId,
           purchaseUnitId: item.purchaseUnitId,
-          quantity:       item.quantity,
-          cost:           item.cost,
+          purchaseQuantity:item.purchaseQuantity,
+          unitCost:       item.unitCost,
           currency:       item.currency,
-          yieldPercent:   item.yieldPercent,
+          yieldPercentage:   item.yieldPercentage,
           description:    item.description || '',
           brand:          item.brand || '',
           supplier:       item.supplier || '',
@@ -186,9 +186,9 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
 
   /** Public so the template can call it on (blur) */
   updateCostSummary(): void {
-    const cost = this.form.get('cost')?.value;
-    const qty  = this.form.get('quantity')?.value;
-    const yld  = this.form.get('yieldPercent')?.value;
+    const cost = this.form.get('unitCost')?.value;
+    const qty  = this.form.get('purchaseQuantity')?.value;
+    const yld  = this.form.get('yieldPercentage')?.value;
     const currency = this.form.get('currency')?.value ?? 'MXN';
 
     if (cost != null && qty != null && yld != null && qty > 0 && yld > 0) {
@@ -269,10 +269,10 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
       supplier:       v.supplier || undefined,
       categoryId:     v.categoryId!,
       purchaseUnitId: v.purchaseUnitId!,
-      quantity:       v.quantity!,
-      cost:           v.cost!,
+      purchaseQuantity:       v.purchaseQuantity!,
+      unitCost:           v.unitCost!,
       currency:       v.currency!,
-      yieldPercent:   v.yieldPercent!,
+      yieldPercentage:   v.yieldPercentage!,
       minimumStock:   v.minimumStock ?? undefined,
       densityConversion
     };
@@ -309,13 +309,13 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
     if (!ctrl?.errors || !ctrl.touched) return '';
     if (ctrl.errors['required'])   return 'Este campo es obligatorio';
     if (ctrl.errors['min']) {
-      if (field === 'yieldPercent') return 'El rendimiento mínimo es 1%';
+      if (field === 'yieldPercentage') return 'El rendimiento mínimo es 1%';
       if (field === 'cost')         return 'El costo no puede ser negativo';
-      if (field === 'quantity')     return 'La cantidad debe ser mayor a 0';
+      if (field === 'purchaseQuantity')     return 'La cantidad debe ser mayor a 0';
       return `El valor mínimo es ${ctrl.errors['min'].min}`;
     }
     if (ctrl.errors['max']) {
-      if (field === 'yieldPercent') return 'El rendimiento no puede ser mayor a 100%';
+      if (field === 'yieldPercentage') return 'El rendimiento no puede ser mayor a 100%';
       return `El valor máximo es ${ctrl.errors['max'].max}`;
     }
     if (ctrl.errors['minlength']) return `Mínimo ${ctrl.errors['minlength'].requiredLength} caracteres`;

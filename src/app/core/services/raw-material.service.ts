@@ -25,7 +25,7 @@ export class RawMaterialService {
     });
   }
 
-  getById(id: number): Observable<ApiResponse<RawMaterialResponse>> {
+  getById(id: string): Observable<ApiResponse<RawMaterialResponse>> {
     return this.http.get<ApiResponse<RawMaterialResponse>>(`${this.API}/${id}`);
   }
 
