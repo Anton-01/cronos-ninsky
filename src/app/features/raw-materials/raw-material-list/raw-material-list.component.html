@@ -1,13 +1,14 @@
 <div class="kt-container-fixed">
+  <!-- Page Header -->
   <div class="flex items-center justify-between py-5">
     <div>
-      <h1 class="text-xl font-semibold text-foreground">Unidades de Medida</h1>
-      <p class="text-sm text-muted-foreground mt-1">Gestión del catálogo de unidades de medida del sistema</p>
+      <h1 class="text-xl font-semibold text-foreground">Ingredientes</h1>
+      <p class="text-sm text-muted-foreground mt-1">Gestión del catálogo de materias primas e ingredientes</p>
     </div>
-    <button (click)="openCreate()" class="kt-btn kt-btn-primary gap-2">
+    <a routerLink="/cronos/ingredientes/nuevo" class="kt-btn kt-btn-primary gap-2">
       <i class="ki-filled ki-plus-squared text-base"></i>
-      Nueva Unidad
-    </button>
+      Nuevo Ingrediente
+    </a>
   </div>
 
   @if (errorMessage()) {
@@ -19,7 +20,7 @@
 
   <div class="kt-card">
     <div class="kt-card-header">
-      <h3 class="kt-card-title">Listado</h3>
+      <h3 class="kt-card-title">Listado de Ingredientes</h3>
       <div class="kt-card-toolbar">
         <span class="text-sm text-muted-foreground">{{ totalElements() }} registros</span>
       </div>
@@ -29,7 +30,7 @@
         <div class="flex items-center justify-center py-12">
           <div class="flex items-center gap-3 text-muted-foreground">
             <span class="cc-spinner-muted"></span>
-            <span class="text-sm">Cargando datos...</span>
+            <span class="text-sm">Cargando ingredientes...</span>
           </div>
         </div>
       } @else {
@@ -37,23 +38,28 @@
           <table class="kt-table kt-table-border">
             <thead>
               <tr>
-                <th class="text-xs font-semibold uppercase text-muted-foreground w-14">#</th>
-                <th class="text-xs font-semibold uppercase text-muted-foreground">Código</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground w-10">#</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground">Nombre</th>
-                <th class="text-xs font-semibold uppercase text-muted-foreground">Plural</th>
-                <th class="text-xs font-semibold uppercase text-muted-foreground">Tipo</th>
-                <th class="text-xs font-semibold uppercase text-muted-foreground">Factor Base</th>
-                <th class="text-xs font-semibold uppercase text-muted-foreground">Base</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Categoría</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground">Unidad Compra</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground text-end">Cantidad</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground text-end">Costo</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground text-end">Rendimiento</th>
+                <th class="text-xs font-semibold uppercase text-muted-foreground text-end">Costo/Unidad Base</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground">Estado</th>
                 <th class="text-xs font-semibold uppercase text-muted-foreground text-end">Acciones</th>
               </tr>
             </thead>
             <tbody>
               @if (items().length === 0) {
-                <tr><td colspan="9">
+                <tr><td colspan="10">
                   <div class="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
-                    <i class="ki-filled ki-folder-up text-3xl"></i>
-                    <span class="text-sm">No hay registros disponibles</span>
+                    <i class="ki-filled ki-basket text-3xl"></i>
+                    <span class="text-sm">No hay ingredientes registrados</span>
+                    <a routerLink="/cronos/ingredientes/nuevo" class="kt-btn kt-btn-sm kt-btn-primary gap-1.5 mt-1">
+                      <i class="ki-filled ki-plus-squared text-xs"></i>
+                      Agregar primer ingrediente
+                    </a>
                   </div>
                 </td></tr>
               }
@@ -61,18 +67,31 @@
                 <tr>
                   <td class="text-sm text-muted-foreground">{{ pageRequest.page * pageRequest.size + i + 1 }}</td>
                   <td>
-                    <span class="kt-badge kt-badge-stroke kt-badge-sm" style="font-family:monospace">{{ item.codeIdentity }}</span>
+                    <div class="flex flex-col">
+                      <span class="text-sm font-medium text-foreground">{{ item.name }}</span>
+                      @if (item.brand) {
+                        <span class="text-xs text-muted-foreground">{{ item.brand }}</span>
+                      }
+                    </div>
                   </td>
-                  <td class="text-sm font-medium text-foreground">{{ item.name }}</td>
-                  <td class="text-sm text-muted-foreground">{{ item.namePlural }}</td>
-                  <td class="text-sm text-muted-foreground">{{ item.unitType }}</td>
-                  <td class="text-sm text-foreground" style="font-family:monospace">{{ item.multiplierToBase }}</td>
+                  <td class="text-sm text-muted-foreground">{{ item.categoryName }}</td>
                   <td>
-                    @if (item.isBaseUnit) {
-                      <span class="kt-badge kt-badge-primary kt-badge-sm">Base</span>
-                    } @else {
-                      <span class="kt-badge kt-badge-stroke kt-badge-sm">Derivada</span>
-                    }
+                    <span class="kt-badge kt-badge-stroke kt-badge-sm">{{ item.purchaseUnitCode }}</span>
+                  </td>
+                  <td class="text-sm text-end text-muted-foreground">{{ item.purchaseQuantity }}</td>
+                  <td class="text-sm text-end font-medium text-foreground">
+                    {{ item.currency }} {{ item.unitCost | number:'1.2-2' }}
+                  </td>
+                  <td class="text-end">
+                    <span class="text-sm font-medium"
+                      [class.text-success]="item.yieldPercentage >= 90"
+                      [class.text-warning]="item.yieldPercentage >= 70 && item.yieldPercentage < 90"
+                      [class.text-destructive]="item.yieldPercentage < 70">
+                      {{ item.yieldPercentage }}%
+                    </span>
+                  </td>
+                  <td class="text-sm text-end font-semibold text-primary">
+                    {{ item.currency }} {{ formatCost(item) }}
                   </td>
                   <td>
                     <span class="kt-badge kt-badge-sm" [ngClass]="statusBadge[item.status]">
@@ -81,9 +100,10 @@
                   </td>
                   <td class="text-end">
                     <div class="flex items-center justify-end gap-1.5">
-                      <button (click)="openEdit(item)" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" title="Editar">
+                      <a [routerLink]="['/cronos/ingredientes/editar', item.id]"
+                        class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light" title="Editar">
                         <i class="ki-filled ki-pencil text-sm"></i>
-                      </button>
+                      </a>
                       <button (click)="openDeleteModal(item)"
                         class="kt-btn kt-btn-sm kt-btn-icon kt-btn-light kt-btn-clear-destructive" title="Eliminar">
                         <i class="ki-filled ki-trash text-sm"></i>
@@ -121,13 +141,9 @@
   </div>
 </div>
 
-@if (showForm()) {
-  <app-measurement-unit-form [item]="selectedItem()" (saved)="onSaved($event)" (cancelled)="closeForm()"></app-measurement-unit-form>
-}
-
 @if (showDeleteModal()) {
   <app-delete-confirm-modal
-    entityLabel="Unidad de Medida"
+    entityLabel="Ingrediente"
     [entityName]="deletingItem()?.name ?? ''"
     [details]="deleteDetails()"
     [isDeleting]="isDeleting()"
