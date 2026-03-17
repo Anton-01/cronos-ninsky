@@ -18,6 +18,7 @@ export interface RawMaterialResponse {
   yieldPercentage: number;
   minimumStock?: number;
   hasDensityConversion: boolean;
+  densityConversion?: DensityConversionRequest;
   status: CatalogStatus;
 }
 
