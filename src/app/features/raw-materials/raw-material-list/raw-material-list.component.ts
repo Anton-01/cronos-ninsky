@@ -58,7 +58,7 @@ export class RawMaterialListComponent implements OnInit {
     this.deleteDetails.set([
       { label: 'Nombre', value: item.name },
       { label: 'Categoría', value: item.categoryName },
-      { label: 'Unidad de compra', value: item.purchaseUnitName },
+      { label: 'Unidad de compra', value: item.purchaseUnitCode },
       { label: 'Estado', value: STATUS_LABEL[item.status] ?? item.status }
     ]);
     this.showDeleteModal.set(true);

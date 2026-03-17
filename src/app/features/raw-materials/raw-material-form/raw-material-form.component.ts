@@ -126,7 +126,12 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
     this.measurementUnitService.getAll({ page: 0, size: 200, sort: 'name,asc' })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (res) => { this.measurementUnits.set(res.data.content); this.isLoadingData.set(false); },
+        next: (res) => {
+          this.measurementUnits.set(res.data.content);
+          this.isLoadingData.set(false);
+          // Re-evaluate density switch in case loadItem completed before units were ready
+          this.refreshDensitySwitchVisibility();
+        },
         error: () => { this.errorMessage.set('No se pudieron cargar las unidades de medida.'); this.isLoadingData.set(false); }
       });
   }
@@ -136,19 +141,36 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
       next: (res) => {
         const item: RawMaterialResponse = res.data;
         this.form.patchValue({
-          name:           item.name,
-          categoryId:     item.categoryId,
-          purchaseUnitId: item.purchaseUnitId,
-          purchaseQuantity:item.purchaseQuantity,
-          unitCost:       item.unitCost,
-          currency:       item.currency,
-          yieldPercentage:   item.yieldPercentage,
-          description:    item.description || '',
-          brand:          item.brand || '',
-          supplier:       item.supplier || '',
-          minimumStock:   item.minimumStock ?? null,
-          status:         item.status
+          name:             item.name,
+          categoryId:       item.categoryId,
+          purchaseUnitId:   item.purchaseUnitId,
+          purchaseQuantity: item.purchaseQuantity,
+          unitCost:         item.unitCost,
+          currency:         item.currency,
+          yieldPercentage:  item.yieldPercentage,
+          description:      item.description || '',
+          brand:            item.brand || '',
+          supplier:         item.supplier || '',
+          minimumStock:     item.minimumStock ?? null,
+          status:           item.status
         });
+
+        // Restore density conversion state if the backend returned it
+        if (item.densityConversion) {
+          const dc = item.densityConversion;
+          this.densityEnabled.set(true);
+          this.densitySaved.set({
+            gramsPerCup:        dc.gramsPerCup,
+            gramsPerTablespoon: dc.gramsPerTablespoon ?? undefined,
+            gramsPerTeaspoon:   dc.gramsPerTeaspoon ?? undefined
+          });
+          this.form.patchValue({
+            gramsPerCup:        dc.gramsPerCup,
+            gramsPerTablespoon: dc.gramsPerTablespoon ?? null,
+            gramsPerTeaspoon:   dc.gramsPerTeaspoon ?? null
+          });
+        }
+
         this.updateCostSummary();
       },
       error: (err) => this.errorMessage.set(err?.message || 'Error al cargar el ingrediente')
@@ -169,19 +191,23 @@ export class RawMaterialFormComponent implements OnInit, OnDestroy {
   private setupUnitWatcher(): void {
     this.form.get('purchaseUnitId')!.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        const unit = this.selectedUnit;
-        const isWeightUnit = unit
-          ? WEIGHT_UNIT_TYPES.some(t => unit.unitType?.toLowerCase().includes(t))
-          : false;
-        this.showDensitySwitch.set(isWeightUnit);
-        if (!isWeightUnit) {
-          this.densityEnabled.set(false);
-          this.showDensityModal.set(false);
-          this.densitySaved.set(null);
-          this.form.patchValue({ gramsPerCup: null, gramsPerTablespoon: null, gramsPerTeaspoon: null });
-        }
-      });
+      .subscribe(() => this.refreshDensitySwitchVisibility());
+  }
+
+  /** Re-evaluates showDensitySwitch based on the currently selected unit.
+   *  Called both from the unit watcher and after measurement units finish loading. */
+  private refreshDensitySwitchVisibility(): void {
+    const unit = this.selectedUnit;
+    const isWeightUnit = unit
+      ? WEIGHT_UNIT_TYPES.some(t => unit.unitType?.toLowerCase().includes(t))
+      : false;
+    this.showDensitySwitch.set(isWeightUnit);
+    if (!isWeightUnit) {
+      this.densityEnabled.set(false);
+      this.showDensityModal.set(false);
+      this.densitySaved.set(null);
+      this.form.patchValue({ gramsPerCup: null, gramsPerTablespoon: null, gramsPerTeaspoon: null });
+    }
   }
 
   /** Public so the template can call it on (blur) */
