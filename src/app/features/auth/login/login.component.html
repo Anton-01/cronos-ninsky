@@ -50,38 +50,33 @@
         <input formControlName="username" type="text" placeholder="tu_usuario"
           class="kt-input"
           [attr.aria-invalid]="username.invalid && username.touched ? 'true' : null" />
-        @if (username.invalid && username.touched) {
-          <p class="kt-form-message">
-            @if (username.hasError('required')) { El usuario es requerido. }
-          </p>
-        }
+        <p class="kt-form-message">
+          @if (username.hasError('required')) { El usuario es requerido. }
+        </p>
       </div>
 
       <!-- ── Password ─────────────────────────────────────────────────────── -->
       <div class="kt-form-item">
-        <div class="flex items-center justify-between mb-1.5">
-          <label class="kt-form-label !mb-0">Contraseña</label>
+        <div class="flex items-center justify-between">
+          <label class="kt-form-label">Contraseña</label>
           <a routerLink="/auth/forgot-password"
             class="text-xs text-primary hover:text-primary/80 link shrink-0">
             ¿Olvidaste tu contraseña?
           </a>
         </div>
-        <div class="relative">
+        <!-- kt-input as flex wrapper — native Metronic pattern for input + icon -->
+        <div class="kt-input"
+          [attr.aria-invalid]="password.invalid && password.touched ? 'true' : null">
           <input formControlName="password"
             [type]="showPassword() ? 'text' : 'password'"
-            placeholder="Ingresa tu contraseña"
-            class="kt-input pe-10"
-            [attr.aria-invalid]="password.invalid && password.touched ? 'true' : null" />
-          <button type="button" (click)="togglePassword()"
-            class="absolute inset-y-0 end-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors">
+            placeholder="Ingresa tu contraseña" />
+          <button type="button" (click)="togglePassword()" class="flex shrink-0">
             <i [class]="'ki-filled ' + (showPassword() ? 'ki-eye-slash' : 'ki-eye')"></i>
           </button>
         </div>
-        @if (password.invalid && password.touched) {
-          <p class="kt-form-message">
-            @if (password.hasError('required')) { La contraseña es requerida. }
-          </p>
-        }
+        <p class="kt-form-message">
+          @if (password.hasError('required')) { La contraseña es requerida. }
+        </p>
       </div>
 
     }

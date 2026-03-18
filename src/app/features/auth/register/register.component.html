@@ -20,18 +20,14 @@
         <input type="text" formControlName="firstName" placeholder="Juan"
           class="kt-input"
           [attr.aria-invalid]="f['firstName'].invalid && f['firstName'].touched ? 'true' : null" />
-        @if (f['firstName'].invalid && f['firstName'].touched) {
-          <p class="kt-form-message">Máximo 100 caracteres.</p>
-        }
+        <p class="kt-form-message">Máximo 100 caracteres.</p>
       </div>
       <div class="kt-form-item">
         <label class="kt-form-label">Apellido</label>
         <input type="text" formControlName="lastName" placeholder="Pérez"
           class="kt-input"
           [attr.aria-invalid]="f['lastName'].invalid && f['lastName'].touched ? 'true' : null" />
-        @if (f['lastName'].invalid && f['lastName'].touched) {
-          <p class="kt-form-message">Máximo 100 caracteres.</p>
-        }
+        <p class="kt-form-message">Máximo 100 caracteres.</p>
       </div>
     </div>
 
@@ -43,14 +39,12 @@
       <input type="text" formControlName="username" placeholder="juan_perez"
         class="kt-input"
         [attr.aria-invalid]="f['username'].invalid && f['username'].touched ? 'true' : null" />
-      @if (f['username'].invalid && f['username'].touched) {
-        <p class="kt-form-message">
-          @if (f['username'].hasError('required')) { El usuario es requerido. }
-          @else if (f['username'].hasError('minlength')) { Mínimo 3 caracteres. }
-          @else if (f['username'].hasError('maxlength')) { Máximo 50 caracteres. }
-          @else if (f['username'].hasError('pattern')) { Solo letras, números, puntos, guiones y guiones bajos. }
-        </p>
-      }
+      <p class="kt-form-message">
+        @if (f['username'].hasError('required')) { El usuario es requerido. }
+        @else if (f['username'].hasError('minlength')) { Mínimo 3 caracteres. }
+        @else if (f['username'].hasError('maxlength')) { Máximo 50 caracteres. }
+        @else if (f['username'].hasError('pattern')) { Solo letras, números, puntos, guiones y guiones bajos. }
+      </p>
     </div>
 
     <!-- ── Email ─────────────────────────────────────────────────────────── -->
@@ -61,12 +55,10 @@
       <input type="email" formControlName="email" placeholder="juan@empresa.com"
         class="kt-input"
         [attr.aria-invalid]="f['email'].invalid && f['email'].touched ? 'true' : null" />
-      @if (f['email'].invalid && f['email'].touched) {
-        <p class="kt-form-message">
-          @if (f['email'].hasError('required')) { El email es requerido. }
-          @else if (f['email'].hasError('email')) { El email no es válido. }
-        </p>
-      }
+      <p class="kt-form-message">
+        @if (f['email'].hasError('required')) { El email es requerido. }
+        @else if (f['email'].hasError('email')) { El email no es válido. }
+      </p>
     </div>
 
     <!-- ── Phone ─────────────────────────────────────────────────────────── -->
@@ -75,9 +67,7 @@
       <input type="tel" formControlName="phoneNumber" placeholder="+5491100000000"
         class="kt-input"
         [attr.aria-invalid]="f['phoneNumber'].invalid && f['phoneNumber'].touched ? 'true' : null" />
-      @if (f['phoneNumber'].invalid && f['phoneNumber'].touched) {
-        <p class="kt-form-message">Formato inválido. Ej: +5491100000000</p>
-      }
+      <p class="kt-form-message">Formato inválido. Ej: +5491100000000</p>
     </div>
 
     <!-- ── Password ──────────────────────────────────────────────────────── -->
@@ -85,19 +75,18 @@
       <label class="kt-form-label">
         Contraseña <span class="text-destructive">*</span>
       </label>
-      <div class="relative">
+      <!-- kt-input as flex wrapper — native Metronic pattern for input + icon -->
+      <div class="kt-input"
+        [attr.aria-invalid]="f['password'].invalid && f['password'].touched ? 'true' : null">
         <input [type]="showPassword() ? 'text' : 'password'" formControlName="password"
-          placeholder="Ingresa tu contraseña"
-          class="kt-input pe-10"
-          [attr.aria-invalid]="f['password'].invalid && f['password'].touched ? 'true' : null" />
-        <button type="button" (click)="togglePassword()"
-          class="absolute inset-y-0 end-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors">
+          placeholder="Ingresa tu contraseña" />
+        <button type="button" (click)="togglePassword()" class="flex shrink-0">
           <i [class]="'ki-filled ' + (showPassword() ? 'ki-eye-slash' : 'ki-eye')"></i>
         </button>
       </div>
       <!-- Strength checklist (visible while typing) -->
       @if (f['password'].dirty) {
-        <ul class="mt-2 flex flex-col gap-1">
+        <ul class="flex flex-col gap-1">
           @for (rule of [
             {key: 'minLength',   label: 'Mínimo 8 caracteres'},
             {key: 'uppercase',   label: 'Al menos una mayúscula'},
@@ -113,6 +102,7 @@
           }
         </ul>
       }
+      <p class="kt-form-message">La contraseña es requerida.</p>
     </div>
 
     <!-- ── Confirm Password ──────────────────────────────────────────────── -->
@@ -120,19 +110,15 @@
       <label class="kt-form-label">
         Confirmar contraseña <span class="text-destructive">*</span>
       </label>
-      <div class="relative">
+      <div class="kt-input"
+        [attr.aria-invalid]="f['confirmPassword'].hasError('passwordMismatch') && f['confirmPassword'].touched ? 'true' : null">
         <input [type]="showConfirm() ? 'text' : 'password'" formControlName="confirmPassword"
-          placeholder="Repite tu contraseña"
-          class="kt-input pe-10"
-          [attr.aria-invalid]="f['confirmPassword'].hasError('passwordMismatch') && f['confirmPassword'].touched ? 'true' : null" />
-        <button type="button" (click)="toggleConfirm()"
-          class="absolute inset-y-0 end-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors">
+          placeholder="Repite tu contraseña" />
+        <button type="button" (click)="toggleConfirm()" class="flex shrink-0">
           <i [class]="'ki-filled ' + (showConfirm() ? 'ki-eye-slash' : 'ki-eye')"></i>
         </button>
       </div>
-      @if (f['confirmPassword'].hasError('passwordMismatch') && f['confirmPassword'].touched) {
-        <p class="kt-form-message">Las contraseñas no coinciden.</p>
-      }
+      <p class="kt-form-message">Las contraseñas no coinciden.</p>
     </div>
 
     <!-- ── Submit ────────────────────────────────────────────────────────── -->
