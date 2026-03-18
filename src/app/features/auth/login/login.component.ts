@@ -62,6 +62,7 @@ export class LoginComponent {
         }
 
         this.tokenService.saveTokens(res.data.accessToken, res.data.refreshToken);
+        this.tokenService.saveUserInfo(res.data.username, res.data.email);
         this.toast.success('Bienvenido', `Hola, ${res.data.username}!`);
         this.router.navigate(['/cronos/dashboard']);
       },

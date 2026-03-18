@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { JwtPayload } from '../models/auth.model';
 
-const ACCESS_TOKEN_KEY = 'access_token';
+const ACCESS_TOKEN_KEY  = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const USER_NAME_KEY     = 'user_name';
+const USER_EMAIL_KEY    = 'user_email';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
@@ -20,9 +22,24 @@ export class TokenService {
     return localStorage.getItem(REFRESH_TOKEN_KEY);
   }
 
+  saveUserInfo(username: string, email: string): void {
+    localStorage.setItem(USER_NAME_KEY, username);
+    localStorage.setItem(USER_EMAIL_KEY, email);
+  }
+
+  getUsername(): string {
+    return localStorage.getItem(USER_NAME_KEY) ?? '';
+  }
+
+  getEmail(): string {
+    return localStorage.getItem(USER_EMAIL_KEY) ?? '';
+  }
+
   clearTokens(): void {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(USER_NAME_KEY);
+    localStorage.removeItem(USER_EMAIL_KEY);
   }
 
   parseJwt(token: string): JwtPayload | null {
