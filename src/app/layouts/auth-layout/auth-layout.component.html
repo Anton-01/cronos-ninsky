@@ -1,21 +1,10 @@
 <!-- Auth layout: full-viewport with bakery ERP background -->
-<div class="relative flex flex-1 items-center justify-center px-4 py-8 overflow-hidden">
-
-  <!-- Background SVG -->
-  <img src="assets/media/auth/auth-bg.svg"
-       alt=""
-       aria-hidden="true"
-       class="absolute inset-0 w-full h-full object-cover" />
-
-  <!-- Semi-dark overlay -->
-  <div class="absolute inset-0 bg-black/40"></div>
-
+<div class="relative flex flex-1 items-center justify-center px-4 py-8 overflow-hidden" style="background-image: url(/assets/media/auth/auth-bg.svg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;">
   <!-- Card container — 506px wide, slightly gray background -->
-  <div class="relative z-10 w-full max-w-[506px]"
-       style="filter: drop-shadow(0 24px 64px rgba(0,0,0,0.45))">
-    <div style="background-color: rgba(248,249,252,0.97); border-radius: var(--radius-xl, 0.75rem); overflow: hidden;">
+  <div class="relative z-10" style="width: 30%">
       <router-outlet />
-    </div>
   </div>
-
 </div>
