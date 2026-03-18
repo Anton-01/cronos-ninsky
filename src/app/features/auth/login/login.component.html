@@ -1,152 +1,126 @@
-<!-- ── Login Card ──────────────────────────────────────────────────────────── -->
-<div class="bg-white dark:bg-coal-300 rounded-2xl shadow-sm border border-gray-200 dark:border-coal-200 p-8">
+<div class="kt-card">
+  <form class="kt-card-content flex flex-col gap-5 p-10"
+        [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
-  <!-- Header -->
-  <div class="mb-8 text-center">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">Iniciar Sesión</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400">
-      Accede a tu cuenta para continuar
-    </p>
-  </div>
-
-  <!-- Social Login -->
-  @if (!requiresTwoFactor()) {
-    <div class="flex gap-3 mb-6">
-      <button type="button" (click)="loginWithGoogle()"
-        class="flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-coal-200 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-coal-400 transition-colors">
-        <svg class="w-5 h-5" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        Google
-      </button>
-
-      <button type="button" (click)="loginWithFacebook()"
-        class="flex-1 flex items-center justify-center gap-2 border border-gray-300 dark:border-coal-200 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-coal-400 transition-colors">
-        <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
-          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-        </svg>
-        Facebook
-      </button>
+    <!-- ── Logo ──────────────────────────────────────────────────────────── -->
+    <div class="flex justify-center">
+      <span class="text-2xl font-extrabold text-primary tracking-tight">Cronos</span>
     </div>
 
-    <div class="relative mb-6">
-      <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-gray-200 dark:border-coal-200"></div>
-      </div>
-      <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-white dark:bg-coal-300 px-3 text-gray-400">O continúa con</span>
-      </div>
+    <!-- ── Title ─────────────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-1 text-center">
+      <h3 class="text-xl font-semibold text-foreground">Iniciar Sesión</h3>
+      <p class="text-sm text-muted-foreground">Ingresa tus credenciales para acceder</p>
     </div>
-  }
-
-  <!-- Login Form -->
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
     @if (!requiresTwoFactor()) {
-      <!-- Username -->
-      <div class="mb-4">
-        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Usuario o Email
-        </label>
-        <input id="username" type="text" formControlName="username"
-          placeholder="tu_usuario"
-          [class]="'w-full px-3.5 py-2.5 rounded-lg border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 dark:bg-coal-400 dark:text-white '
-            + (username.invalid && username.touched
-              ? 'border-red-400 dark:border-red-400'
-              : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+
+      <!-- ── Social Login ─────────────────────────────────────────────────── -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <button type="button" (click)="loginWithGoogle()"
+          class="kt-btn kt-btn-light justify-center gap-1.5 text-sm">
+          <svg class="size-4 shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Google
+        </button>
+
+        <button type="button" (click)="loginWithFacebook()"
+          class="kt-btn kt-btn-light justify-center gap-1.5 text-sm">
+          <svg class="size-4 shrink-0" fill="#1877F2" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Facebook
+        </button>
+      </div>
+
+      <!-- ── Divider ──────────────────────────────────────────────────────── -->
+      <div class="flex items-center gap-2">
+        <span class="border-t border-border w-full"></span>
+        <span class="text-xs text-muted-foreground whitespace-nowrap">O continúa con</span>
+        <span class="border-t border-border w-full"></span>
+      </div>
+
+      <!-- ── Username ─────────────────────────────────────────────────────── -->
+      <div class="kt-form-item">
+        <label class="kt-form-label">Usuario o Email</label>
+        <input formControlName="username" type="text" placeholder="tu_usuario"
+          class="kt-input"
+          [attr.aria-invalid]="username.invalid && username.touched ? 'true' : null" />
         @if (username.invalid && username.touched) {
-          <p class="mt-1 text-xs text-red-500">
+          <p class="kt-form-message">
             @if (username.hasError('required')) { El usuario es requerido. }
           </p>
         }
       </div>
 
-      <!-- Password -->
-      <div class="mb-5">
-        <div class="flex justify-between mb-1.5">
-          <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Contraseña
-          </label>
-          <a routerLink="/auth/forgot-password" class="text-xs text-[#17C653] hover:underline">
+      <!-- ── Password ─────────────────────────────────────────────────────── -->
+      <div class="kt-form-item">
+        <div class="flex items-center justify-between mb-1.5">
+          <label class="kt-form-label !mb-0">Contraseña</label>
+          <a routerLink="/auth/forgot-password"
+            class="text-xs text-primary hover:text-primary/80 link shrink-0">
             ¿Olvidaste tu contraseña?
           </a>
         </div>
         <div class="relative">
-          <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password"
-            placeholder="••••••••"
-            [class]="'w-full px-3.5 py-2.5 pr-10 rounded-lg border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 dark:bg-coal-400 dark:text-white '
-              + (password.invalid && password.touched
-                ? 'border-red-400 dark:border-red-400'
-                : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+          <input formControlName="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            placeholder="Ingresa tu contraseña"
+            class="kt-input pe-10"
+            [attr.aria-invalid]="password.invalid && password.touched ? 'true' : null" />
           <button type="button" (click)="togglePassword()"
-            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
-            @if (showPassword()) {
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
-              </svg>
-            } @else {
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-              </svg>
-            }
+            class="absolute inset-y-0 end-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors">
+            <i [class]="'ki-filled ' + (showPassword() ? 'ki-eye-slash' : 'ki-eye')"></i>
           </button>
         </div>
         @if (password.invalid && password.touched) {
-          <p class="mt-1 text-xs text-red-500">
+          <p class="kt-form-message">
             @if (password.hasError('required')) { La contraseña es requerida. }
           </p>
         }
       </div>
+
     }
 
-    <!-- Two-Factor PIN -->
+    <!-- ── Two-Factor PIN ────────────────────────────────────────────────── -->
     @if (requiresTwoFactor()) {
-      <div class="mb-6">
-        <div class="text-center mb-5">
-          <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#17C653]/10 mb-3">
-            <svg class="w-7 h-7 text-[#17C653]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-          </div>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
+      <div class="flex flex-col items-center gap-3 text-center py-2">
+        <div class="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+          <i class="ki-filled ki-lock-3 text-primary text-xl"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-semibold text-foreground">Verificación en dos pasos</h3>
+          <p class="text-sm text-muted-foreground mt-1">
             Ingresa el código de 6 dígitos de tu aplicación autenticadora.
           </p>
         </div>
-        <label for="twoFactorCode" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Código de verificación
-        </label>
-        <input id="twoFactorCode" type="number" formControlName="twoFactorCode"
-          placeholder="123456" maxlength="6"
-          class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 dark:border-coal-200 text-sm text-center tracking-[0.5em] font-mono focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 focus:border-[#17C653] dark:bg-coal-400 dark:text-white" />
+      </div>
+
+      <div class="kt-form-item">
+        <label class="kt-form-label">Código de verificación</label>
+        <input formControlName="twoFactorCode" type="number" placeholder="123456"
+          class="kt-input text-center tracking-[0.5em] font-mono" />
       </div>
     }
 
-    <!-- Submit -->
-    <button type="submit" [disabled]="isLoading()"
-      class="w-full flex items-center justify-center gap-2 bg-[#17C653] hover:bg-[#15b34a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-lg px-4 py-2.5 transition-colors">
-      @if (isLoading()) {
-        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
-      }
+    <!-- ── Submit ────────────────────────────────────────────────────────── -->
+    <button type="submit" class="kt-btn kt-btn-primary w-full justify-center"
+      [disabled]="isLoading()">
+      @if (isLoading()) { <span class="cc-spinner"></span> }
       {{ requiresTwoFactor() ? 'Verificar código' : 'Iniciar sesión' }}
     </button>
 
+    <!-- ── Footer ────────────────────────────────────────────────────────── -->
+    <div class="text-center text-xs text-muted-foreground">
+      ¿No tienes cuenta?
+      <a routerLink="/auth/register" class="text-primary hover:text-primary/80 font-medium link">
+        Crear cuenta
+      </a>
+    </div>
+
   </form>
-
-  <!-- Footer -->
-  <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-    ¿No tienes cuenta?
-    <a routerLink="/auth/register" class="text-[#17C653] font-medium hover:underline">Crear cuenta</a>
-  </p>
-
 </div>

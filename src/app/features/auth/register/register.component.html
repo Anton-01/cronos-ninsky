@@ -1,39 +1,50 @@
-<!-- ── Register Card ───────────────────────────────────────────────────────── -->
-<div class="bg-white dark:bg-coal-300 rounded-2xl shadow-sm border border-gray-200 dark:border-coal-200 p-8">
+<div class="kt-card">
+  <form class="kt-card-content flex flex-col gap-5 p-10"
+        [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
-  <div class="mb-6 text-center">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">Crear cuenta</h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400">Completa los datos para registrarte</p>
-  </div>
+    <!-- ── Logo ──────────────────────────────────────────────────────────── -->
+    <div class="flex justify-center">
+      <span class="text-2xl font-extrabold text-primary tracking-tight">Cronos</span>
+    </div>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+    <!-- ── Title ─────────────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-1 text-center">
+      <h3 class="text-xl font-semibold text-foreground">Crear cuenta</h3>
+      <p class="text-sm text-muted-foreground">Completa los datos para registrarte</p>
+    </div>
 
-    <!-- Row: First name / Last name -->
-    <div class="grid grid-cols-2 gap-3">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
+    <!-- ── Name row ───────────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="kt-form-item">
+        <label class="kt-form-label">Nombre</label>
         <input type="text" formControlName="firstName" placeholder="Juan"
-          [class]="'w-full px-3.5 py-2.5 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
-            + (f['firstName'].invalid && f['firstName'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+          class="kt-input"
+          [attr.aria-invalid]="f['firstName'].invalid && f['firstName'].touched ? 'true' : null" />
+        @if (f['firstName'].invalid && f['firstName'].touched) {
+          <p class="kt-form-message">Máximo 100 caracteres.</p>
+        }
       </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Apellido</label>
+      <div class="kt-form-item">
+        <label class="kt-form-label">Apellido</label>
         <input type="text" formControlName="lastName" placeholder="Pérez"
-          [class]="'w-full px-3.5 py-2.5 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
-            + (f['lastName'].invalid && f['lastName'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+          class="kt-input"
+          [attr.aria-invalid]="f['lastName'].invalid && f['lastName'].touched ? 'true' : null" />
+        @if (f['lastName'].invalid && f['lastName'].touched) {
+          <p class="kt-form-message">Máximo 100 caracteres.</p>
+        }
       </div>
     </div>
 
-    <!-- Username -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-        Nombre de usuario <span class="text-red-400">*</span>
+    <!-- ── Username ──────────────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">
+        Nombre de usuario <span class="text-destructive">*</span>
       </label>
       <input type="text" formControlName="username" placeholder="juan_perez"
-        [class]="'w-full px-3.5 py-2.5 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
-          + (f['username'].invalid && f['username'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+        class="kt-input"
+        [attr.aria-invalid]="f['username'].invalid && f['username'].touched ? 'true' : null" />
       @if (f['username'].invalid && f['username'].touched) {
-        <p class="mt-1 text-xs text-red-500">
+        <p class="kt-form-message">
           @if (f['username'].hasError('required')) { El usuario es requerido. }
           @else if (f['username'].hasError('minlength')) { Mínimo 3 caracteres. }
           @else if (f['username'].hasError('maxlength')) { Máximo 50 caracteres. }
@@ -42,112 +53,102 @@
       }
     </div>
 
-    <!-- Email -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-        Email <span class="text-red-400">*</span>
+    <!-- ── Email ─────────────────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">
+        Email <span class="text-destructive">*</span>
       </label>
       <input type="email" formControlName="email" placeholder="juan@empresa.com"
-        [class]="'w-full px-3.5 py-2.5 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
-          + (f['email'].invalid && f['email'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+        class="kt-input"
+        [attr.aria-invalid]="f['email'].invalid && f['email'].touched ? 'true' : null" />
       @if (f['email'].invalid && f['email'].touched) {
-        <p class="mt-1 text-xs text-red-500">
+        <p class="kt-form-message">
           @if (f['email'].hasError('required')) { El email es requerido. }
           @else if (f['email'].hasError('email')) { El email no es válido. }
         </p>
       }
     </div>
 
-    <!-- Phone -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Teléfono</label>
+    <!-- ── Phone ─────────────────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">Teléfono</label>
       <input type="tel" formControlName="phoneNumber" placeholder="+5491100000000"
-        [class]="'w-full px-3.5 py-2.5 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
-          + (f['phoneNumber'].invalid && f['phoneNumber'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+        class="kt-input"
+        [attr.aria-invalid]="f['phoneNumber'].invalid && f['phoneNumber'].touched ? 'true' : null" />
       @if (f['phoneNumber'].invalid && f['phoneNumber'].touched) {
-        <p class="mt-1 text-xs text-red-500">Formato inválido. Ej: +5491100000000</p>
+        <p class="kt-form-message">Formato inválido. Ej: +5491100000000</p>
       }
     </div>
 
-    <!-- Password -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-        Contraseña <span class="text-red-400">*</span>
+    <!-- ── Password ──────────────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">
+        Contraseña <span class="text-destructive">*</span>
       </label>
       <div class="relative">
-        <input [type]="showPassword() ? 'text' : 'password'" formControlName="password" placeholder="••••••••"
-          [class]="'w-full px-3.5 py-2.5 pr-10 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
-            + (f['password'].invalid && f['password'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+        <input [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+          placeholder="Ingresa tu contraseña"
+          class="kt-input pe-10"
+          [attr.aria-invalid]="f['password'].invalid && f['password'].touched ? 'true' : null" />
         <button type="button" (click)="togglePassword()"
-          class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-          </svg>
+          class="absolute inset-y-0 end-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors">
+          <i [class]="'ki-filled ' + (showPassword() ? 'ki-eye-slash' : 'ki-eye')"></i>
         </button>
       </div>
-      <!-- Strength checklist -->
+      <!-- Strength checklist (visible while typing) -->
       @if (f['password'].dirty) {
-        <ul class="mt-2 space-y-1">
-          <li [class]="'flex items-center gap-1.5 text-xs ' + (!f['password'].hasError('minLength') ? 'text-green-600' : 'text-gray-400')">
-            <span>{{ !f['password'].hasError('minLength') ? '✓' : '○' }}</span> Mínimo 8 caracteres
-          </li>
-          <li [class]="'flex items-center gap-1.5 text-xs ' + (!f['password'].hasError('uppercase') ? 'text-green-600' : 'text-gray-400')">
-            <span>{{ !f['password'].hasError('uppercase') ? '✓' : '○' }}</span> Al menos una mayúscula
-          </li>
-          <li [class]="'flex items-center gap-1.5 text-xs ' + (!f['password'].hasError('number') ? 'text-green-600' : 'text-gray-400')">
-            <span>{{ !f['password'].hasError('number') ? '✓' : '○' }}</span> Al menos un número
-          </li>
-          <li [class]="'flex items-center gap-1.5 text-xs ' + (!f['password'].hasError('specialChar') ? 'text-green-600' : 'text-gray-400')">
-            <span>{{ !f['password'].hasError('specialChar') ? '✓' : '○' }}</span> Al menos un carácter especial
-          </li>
+        <ul class="mt-2 flex flex-col gap-1">
+          @for (rule of [
+            {key: 'minLength',   label: 'Mínimo 8 caracteres'},
+            {key: 'uppercase',   label: 'Al menos una mayúscula'},
+            {key: 'number',      label: 'Al menos un número'},
+            {key: 'specialChar', label: 'Al menos un carácter especial'}
+          ]; track rule.key) {
+            <li class="flex items-center gap-1.5 text-xs"
+              [class.text-success]="!f['password'].hasError(rule.key)"
+              [class.text-muted-foreground]="f['password'].hasError(rule.key)">
+              <i [class]="'ki-filled text-xs ' + (!f['password'].hasError(rule.key) ? 'ki-check-circle' : 'ki-circle')"></i>
+              {{ rule.label }}
+            </li>
+          }
         </ul>
       }
     </div>
 
-    <!-- Confirm Password -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-        Confirmar contraseña <span class="text-red-400">*</span>
+    <!-- ── Confirm Password ──────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">
+        Confirmar contraseña <span class="text-destructive">*</span>
       </label>
       <div class="relative">
-        <input [type]="showConfirm() ? 'text' : 'password'" formControlName="confirmPassword" placeholder="••••••••"
-          [class]="'w-full px-3.5 py-2.5 pr-10 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
-            + (f['confirmPassword'].invalid && f['confirmPassword'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+        <input [type]="showConfirm() ? 'text' : 'password'" formControlName="confirmPassword"
+          placeholder="Repite tu contraseña"
+          class="kt-input pe-10"
+          [attr.aria-invalid]="f['confirmPassword'].hasError('passwordMismatch') && f['confirmPassword'].touched ? 'true' : null" />
         <button type="button" (click)="toggleConfirm()"
-          class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-          </svg>
+          class="absolute inset-y-0 end-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors">
+          <i [class]="'ki-filled ' + (showConfirm() ? 'ki-eye-slash' : 'ki-eye')"></i>
         </button>
       </div>
       @if (f['confirmPassword'].hasError('passwordMismatch') && f['confirmPassword'].touched) {
-        <p class="mt-1 text-xs text-red-500">Las contraseñas no coinciden.</p>
+        <p class="kt-form-message">Las contraseñas no coinciden.</p>
       }
     </div>
 
-    <!-- Submit -->
-    <button type="submit" [disabled]="isLoading()"
-      class="w-full flex items-center justify-center gap-2 bg-[#17C653] hover:bg-[#15b34a] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-lg px-4 py-2.5 transition-colors">
-      @if (isLoading()) {
-        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
-      }
+    <!-- ── Submit ────────────────────────────────────────────────────────── -->
+    <button type="submit" class="kt-btn kt-btn-primary w-full justify-center"
+      [disabled]="isLoading()">
+      @if (isLoading()) { <span class="cc-spinner"></span> }
       Crear cuenta
     </button>
 
+    <!-- ── Footer ────────────────────────────────────────────────────────── -->
+    <div class="text-center text-xs text-muted-foreground">
+      ¿Ya tienes cuenta?
+      <a routerLink="/auth/login" class="text-primary hover:text-primary/80 font-medium link">
+        Iniciar sesión
+      </a>
+    </div>
+
   </form>
-
-  <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-    ¿Ya tienes cuenta?
-    <a routerLink="/auth/login" class="text-[#17C653] font-medium hover:underline">Iniciar sesión</a>
-  </p>
-
 </div>

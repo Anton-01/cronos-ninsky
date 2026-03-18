@@ -1,21 +1,6 @@
-<!-- Metronic Auth Layout: full-screen split with brand panel + form panel -->
-<div class="flex min-h-screen bg-gray-50 dark:bg-coal-500">
-
-  <!-- Brand / illustration panel (hidden on mobile) -->
-  <div class="hidden lg:flex lg:w-1/2 bg-[#17C653] items-center justify-center p-12">
-    <div class="text-center text-white">
-      <div class="text-5xl font-extrabold tracking-tight mb-4">Cronos</div>
-      <p class="text-lg opacity-80 max-w-sm">
-        Gestión empresarial eficiente.<br>Todo lo que necesitas en un solo lugar.
-      </p>
-    </div>
+<!-- Classic Metronic auth layout – centered single column -->
+<div class="flex items-center justify-center min-h-screen bg-background px-4 py-8">
+  <div class="w-full max-w-[440px]">
+    <router-outlet />
   </div>
-
-  <!-- Form panel -->
-  <div class="flex flex-1 items-center justify-center p-6">
-    <div class="w-full max-w-md">
-      <router-outlet />
-    </div>
-  </div>
-
 </div>
