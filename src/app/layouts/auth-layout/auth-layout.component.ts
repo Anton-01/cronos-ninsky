@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -7,4 +7,6 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
   templateUrl: './auth-layout.component.html'
 })
-export class AuthLayoutComponent {}
+export class AuthLayoutComponent {
+  @HostBinding('class') class = 'flex grow';
+}
