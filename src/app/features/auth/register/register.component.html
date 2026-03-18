@@ -1,0 +1,140 @@
+<div class="kt-card">
+  <form class="kt-card-content flex flex-col gap-5 p-10"
+        [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+    <!-- ── Logo ──────────────────────────────────────────────────────────── -->
+    <div class="flex justify-center">
+      <span class="text-2xl font-extrabold text-primary tracking-tight">Cronos</span>
+    </div>
+
+    <!-- ── Title ─────────────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-1 text-center">
+      <h3 class="text-xl font-semibold text-foreground">Crear cuenta</h3>
+      <p class="text-sm text-muted-foreground">Completa los datos para registrarte</p>
+    </div>
+
+    <!-- ── Name row ───────────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-2 gap-4">
+      <div class="kt-form-item">
+        <label class="kt-form-label">Nombre</label>
+        <input type="text" formControlName="firstName" placeholder="Juan"
+          class="kt-input"
+          [attr.aria-invalid]="f['firstName'].invalid && f['firstName'].touched ? 'true' : null" />
+        <p class="kt-form-message">Máximo 100 caracteres.</p>
+      </div>
+      <div class="kt-form-item">
+        <label class="kt-form-label">Apellido</label>
+        <input type="text" formControlName="lastName" placeholder="Pérez"
+          class="kt-input"
+          [attr.aria-invalid]="f['lastName'].invalid && f['lastName'].touched ? 'true' : null" />
+        <p class="kt-form-message">Máximo 100 caracteres.</p>
+      </div>
+    </div>
+
+    <!-- ── Username ──────────────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">
+        Nombre de usuario <span class="text-destructive">*</span>
+      </label>
+      <input type="text" formControlName="username" placeholder="juan_perez"
+        class="kt-input"
+        [attr.aria-invalid]="f['username'].invalid && f['username'].touched ? 'true' : null" />
+      <p class="kt-form-message">
+        @if (f['username'].hasError('required')) { El usuario es requerido. }
+        @else if (f['username'].hasError('minlength')) { Mínimo 3 caracteres. }
+        @else if (f['username'].hasError('maxlength')) { Máximo 50 caracteres. }
+        @else if (f['username'].hasError('pattern')) { Solo letras, números, puntos, guiones y guiones bajos. }
+      </p>
+    </div>
+
+    <!-- ── Email ─────────────────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">
+        Email <span class="text-destructive">*</span>
+      </label>
+      <input type="email" formControlName="email" placeholder="juan@empresa.com"
+        class="kt-input"
+        [attr.aria-invalid]="f['email'].invalid && f['email'].touched ? 'true' : null" />
+      <p class="kt-form-message">
+        @if (f['email'].hasError('required')) { El email es requerido. }
+        @else if (f['email'].hasError('email')) { El email no es válido. }
+      </p>
+    </div>
+
+    <!-- ── Phone ─────────────────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">Teléfono</label>
+      <input type="tel" formControlName="phoneNumber" placeholder="+5491100000000"
+        class="kt-input"
+        [attr.aria-invalid]="f['phoneNumber'].invalid && f['phoneNumber'].touched ? 'true' : null" />
+      <p class="kt-form-message">Formato inválido. Ej: +5491100000000</p>
+    </div>
+
+    <!-- ── Password ──────────────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">
+        Contraseña <span class="text-destructive">*</span>
+      </label>
+      <!-- kt-input as flex wrapper — native Metronic pattern for input + icon -->
+      <div class="kt-input"
+        [attr.aria-invalid]="f['password'].invalid && f['password'].touched ? 'true' : null">
+        <input [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+          placeholder="Ingresa tu contraseña" />
+        <button type="button" (click)="togglePassword()" class="flex shrink-0">
+          <i [class]="'ki-filled ' + (showPassword() ? 'ki-eye-slash' : 'ki-eye')"></i>
+        </button>
+      </div>
+      <!-- Strength checklist (visible while typing) -->
+      @if (f['password'].dirty) {
+        <ul class="flex flex-col gap-1">
+          @for (rule of [
+            {key: 'minLength',   label: 'Mínimo 8 caracteres'},
+            {key: 'uppercase',   label: 'Al menos una mayúscula'},
+            {key: 'number',      label: 'Al menos un número'},
+            {key: 'specialChar', label: 'Al menos un carácter especial'}
+          ]; track rule.key) {
+            <li class="flex items-center gap-1.5 text-xs"
+              [class.text-success]="!f['password'].hasError(rule.key)"
+              [class.text-muted-foreground]="f['password'].hasError(rule.key)">
+              <i [class]="'ki-filled text-xs ' + (!f['password'].hasError(rule.key) ? 'ki-check-circle' : 'ki-circle')"></i>
+              {{ rule.label }}
+            </li>
+          }
+        </ul>
+      }
+      <p class="kt-form-message">La contraseña es requerida.</p>
+    </div>
+
+    <!-- ── Confirm Password ──────────────────────────────────────────────── -->
+    <div class="kt-form-item">
+      <label class="kt-form-label">
+        Confirmar contraseña <span class="text-destructive">*</span>
+      </label>
+      <div class="kt-input"
+        [attr.aria-invalid]="f['confirmPassword'].hasError('passwordMismatch') && f['confirmPassword'].touched ? 'true' : null">
+        <input [type]="showConfirm() ? 'text' : 'password'" formControlName="confirmPassword"
+          placeholder="Repite tu contraseña" />
+        <button type="button" (click)="toggleConfirm()" class="flex shrink-0">
+          <i [class]="'ki-filled ' + (showConfirm() ? 'ki-eye-slash' : 'ki-eye')"></i>
+        </button>
+      </div>
+      <p class="kt-form-message">Las contraseñas no coinciden.</p>
+    </div>
+
+    <!-- ── Submit ────────────────────────────────────────────────────────── -->
+    <button type="submit" class="kt-btn kt-btn-primary w-full justify-center"
+      [disabled]="isLoading()">
+      @if (isLoading()) { <span class="cc-spinner"></span> }
+      Crear cuenta
+    </button>
+
+    <!-- ── Footer ────────────────────────────────────────────────────────── -->
+    <div class="text-center text-xs text-muted-foreground">
+      ¿Ya tienes cuenta?
+      <a routerLink="/auth/login" class="text-primary hover:text-primary/80 font-medium link">
+        Iniciar sesión
+      </a>
+    </div>
+
+  </form>
+</div>
