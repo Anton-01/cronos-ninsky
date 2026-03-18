@@ -91,6 +91,19 @@ export class TokenService {
   }
 
   hasRole(role: string): boolean {
-    return this.getRoles().includes(role);
+    const roles = this.getRoles();
+    // Support both Spring's "ROLE_ADMIN" convention and plain "ADMIN"
+    return roles.includes(role) || roles.includes(`ROLE_${role}`);
+  }
+
+  /**
+   * Returns the primary role as a display-friendly label.
+   * Priority: ADMIN > USER > first available > 'USER'
+   */
+  getPrimaryRole(): string {
+    const roles = this.getRoles().map(r => r.replace(/^ROLE_/, ''));
+    if (roles.includes('ADMIN')) return 'ADMIN';
+    if (roles.includes('USER'))  return 'USER';
+    return roles[0] ?? 'USER';
   }
 }

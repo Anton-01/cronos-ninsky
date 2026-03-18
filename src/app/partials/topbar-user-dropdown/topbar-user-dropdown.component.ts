@@ -17,8 +17,9 @@ export class TopbarUserDropdownComponent {
   effectiveTheme = this.themeService.effectiveTheme;
   setThemeMode   = this.themeService.setThemeMode.bind(this.themeService);
 
-  username = signal(this.tokenService.getUsername());
-  email    = signal(this.tokenService.getEmail());
+  username    = signal(this.tokenService.getUsername());
+  email       = signal(this.tokenService.getEmail());
+  primaryRole = signal(this.tokenService.getPrimaryRole());
 
   onThemeToggle(event: Event): void {
     const input = event.target as HTMLInputElement | null;
