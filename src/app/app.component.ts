@@ -20,6 +20,7 @@ export class AppComponent {
   private metronicInitService = inject(MetronicInitService);
 
   private demoClassMap: Record<string, string> = {
+    auth: '',
     cronos: 'demo1 kt-sidebar-fixed kt-header-fixed',
     demo2: '[--header-height:100px] data-[kt-sticky-header=on]:[--header-height:60px]',
     demo3: '[--header-height:58px] [--sidebar-width:58px] [--navbar-height:56px] lg:overflow-hidden bg-muted',

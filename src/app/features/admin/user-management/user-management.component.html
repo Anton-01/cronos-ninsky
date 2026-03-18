@@ -1,0 +1,287 @@
+<!-- ── User Management ────────────────────────────────────────────────────── -->
+<div class="space-y-5">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-bold text-gray-900 dark:text-white">Gestión de Usuarios</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+        {{ totalElements() }} usuario{{ totalElements() === 1 ? '' : 's' }} registrados
+      </p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white dark:bg-coal-300 rounded-2xl border border-gray-200 dark:border-coal-200 p-4">
+    <div class="flex flex-wrap gap-3 items-end">
+
+      <div>
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Rol</label>
+        <select [value]="roleFilter()" (change)="roleFilter.set($any($event.target).value)"
+          class="px-3 py-2 rounded-lg border border-gray-300 dark:border-coal-200 text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 focus:border-[#17C653]">
+          <option value="">Todos los roles</option>
+          <option value="ADMIN">ADMIN</option>
+          <option value="USER">USER</option>
+          <option value="MANAGER">MANAGER</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Estado</label>
+        <select [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)"
+          class="px-3 py-2 rounded-lg border border-gray-300 dark:border-coal-200 text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 focus:border-[#17C653]">
+          <option value="">Todos</option>
+          <option value="active">Activo</option>
+          <option value="blocked">Bloqueado</option>
+        </select>
+      </div>
+
+      <button type="button" (click)="applyFilters()"
+        class="px-4 py-2 text-sm font-semibold bg-[#17C653] hover:bg-[#15b34a] text-white rounded-lg transition-colors">
+        Filtrar
+      </button>
+
+      <button type="button" (click)="roleFilter.set(''); statusFilter.set(''); applyFilters()"
+        class="px-4 py-2 text-sm font-medium border border-gray-300 dark:border-coal-200 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-coal-400 rounded-lg transition-colors">
+        Limpiar
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Table + Side panel -->
+  <div class="flex gap-5">
+
+    <!-- Table -->
+    <div class="flex-1 bg-white dark:bg-coal-300 rounded-2xl border border-gray-200 dark:border-coal-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-50 dark:bg-coal-400">
+            <tr>
+              <th class="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Usuario</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Roles</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Estado</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">2FA</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500 dark:text-gray-400">Creado</th>
+              <th class="px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (isLoading()) {
+              @for (_ of [1,2,3,4,5]; track _) {
+                <tr class="border-t border-gray-100 dark:border-coal-200">
+                  @for (__ of [1,2,3,4,5,6]; track __) {
+                    <td class="px-4 py-3"><div class="h-4 bg-gray-100 dark:bg-coal-400 rounded animate-pulse"></div></td>
+                  }
+                </tr>
+              }
+            } @else if (users().length === 0) {
+              <tr>
+                <td colspan="6" class="px-4 py-10 text-center text-sm text-gray-400">
+                  No se encontraron usuarios con los filtros aplicados.
+                </td>
+              </tr>
+            } @else {
+              @for (user of users(); track user.id) {
+                <tr class="border-t border-gray-100 dark:border-coal-200 hover:bg-gray-50 dark:hover:bg-coal-400/50 transition-colors"
+                  [class.bg-[#17C653]/5]="selectedUser()?.id === user.id">
+
+                  <td class="px-4 py-3">
+                    <div class="font-medium text-gray-900 dark:text-white">{{ user.username }}</div>
+                    <div class="text-xs text-gray-400">{{ user.email }}</div>
+                  </td>
+
+                  <td class="px-4 py-3">
+                    <div class="flex gap-1 flex-wrap">
+                      @for (role of user.roles; track role) {
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
+                          [class]="role === 'ADMIN' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                                 : role === 'MANAGER' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                 : 'bg-gray-100 text-gray-600 dark:bg-coal-400 dark:text-gray-300'">
+                          {{ role }}
+                        </span>
+                      }
+                    </div>
+                  </td>
+
+                  <td class="px-4 py-3">
+                    @if (!user.accountNonLocked) {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                        Bloqueado
+                      </span>
+                    } @else if (user.enabled) {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                        Activo
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 dark:bg-coal-400 dark:text-gray-400">
+                        Inactivo
+                      </span>
+                    }
+                  </td>
+
+                  <td class="px-4 py-3">
+                    <span [class]="user.twoFactorEnabled ? 'text-green-600' : 'text-gray-400'">
+                      {{ user.twoFactorEnabled ? '✓' : '—' }}
+                    </span>
+                  </td>
+
+                  <td class="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+                    {{ user.createdAt | date:'dd/MM/yyyy' }}
+                  </td>
+
+                  <td class="px-4 py-3 text-right">
+                    <!-- Actions dropdown -->
+                    <div class="relative inline-block">
+                      <button type="button" (click)="toggleDropdown(user.id)"
+                        class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-coal-400 transition-colors">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/>
+                        </svg>
+                      </button>
+
+                      @if (openDropdownId() === user.id) {
+                        <div class="absolute right-0 z-20 mt-1 w-48 bg-white dark:bg-coal-300 rounded-xl shadow-lg border border-gray-200 dark:border-coal-200 py-1">
+                          <button type="button" (click)="viewDetails(user)"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-coal-400">
+                            Ver detalles
+                          </button>
+                          <button type="button" (click)="openAssignRoles(user)"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-coal-400">
+                            Asignar roles
+                          </button>
+                          <div class="border-t border-gray-100 dark:border-coal-200 my-1"></div>
+                          <button type="button" (click)="toggleBlock(user)" [disabled]="isActioning()"
+                            [class]="'w-full text-left px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-coal-400 disabled:opacity-50 '
+                              + (user.accountNonLocked ? 'text-red-600' : 'text-green-600')">
+                            {{ user.accountNonLocked ? 'Bloquear usuario' : 'Desbloquear usuario' }}
+                          </button>
+                        </div>
+                        <!-- Backdrop to close dropdown -->
+                        <div class="fixed inset-0 z-10" (click)="openDropdownId.set(null)"></div>
+                      }
+                    </div>
+                  </td>
+
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      @if (totalPages() > 1) {
+        <div class="flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-coal-200">
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Página {{ pageRequest.page + 1 }} de {{ totalPages() }}
+          </p>
+          <div class="flex gap-1">
+            <button type="button" (click)="goToPage(pageRequest.page - 1)" [disabled]="pageRequest.page === 0"
+              class="px-3 py-1.5 text-xs font-medium border border-gray-300 dark:border-coal-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-coal-400 transition-colors text-gray-700 dark:text-gray-300">
+              ←
+            </button>
+            @for (p of pages; track p) {
+              @if (p === pageRequest.page || (p >= pageRequest.page - 1 && p <= pageRequest.page + 1)) {
+                <button type="button" (click)="goToPage(p)"
+                  [class]="'px-3 py-1.5 text-xs font-medium rounded-lg transition-colors '
+                    + (p === pageRequest.page
+                      ? 'bg-[#17C653] text-white'
+                      : 'border border-gray-300 dark:border-coal-200 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-coal-400')">
+                  {{ p + 1 }}
+                </button>
+              }
+            }
+            <button type="button" (click)="goToPage(pageRequest.page + 1)" [disabled]="pageRequest.page >= totalPages() - 1"
+              class="px-3 py-1.5 text-xs font-medium border border-gray-300 dark:border-coal-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-coal-400 transition-colors text-gray-700 dark:text-gray-300">
+              →
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Side panel: User details -->
+    @if (activePanel() === 'details' && selectedUser()) {
+      <div class="w-80 flex-shrink-0 bg-white dark:bg-coal-300 rounded-2xl border border-gray-200 dark:border-coal-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Detalles del usuario</h4>
+          <button type="button" (click)="closePanel()"
+            class="p-1 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-coal-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          @for (row of [
+            {label:'ID',          value: selectedUser()!.id},
+            {label:'Usuario',     value: selectedUser()!.username},
+            {label:'Email',       value: selectedUser()!.email},
+            {label:'Nombre',      value: (selectedUser()!.firstName ?? '') + ' ' + (selectedUser()!.lastName ?? '')},
+            {label:'Teléfono',    value: selectedUser()!.phoneNumber ?? '—'},
+            {label:'2FA',         value: selectedUser()!.twoFactorEnabled ? 'Habilitado' : 'Deshabilitado'},
+            {label:'Intentos fallidos', value: selectedUser()!.failedLoginAttempts + ''},
+            {label:'Último login', value: selectedUser()!.lastLoginAt ? (selectedUser()!.lastLoginAt | date:'dd/MM/yyyy HH:mm') : '—'},
+            {label:'Creado',      value: selectedUser()!.createdAt | date:'dd/MM/yyyy'}
+          ]; track row.label) {
+            <div>
+              <p class="text-xs text-gray-400 dark:text-gray-500">{{ row.label }}</p>
+              <p class="text-sm text-gray-800 dark:text-gray-200 font-medium break-all">{{ row.value }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Side panel: Assign roles -->
+    @if (activePanel() === 'roles' && selectedUser()) {
+      <div class="w-72 flex-shrink-0 bg-white dark:bg-coal-300 rounded-2xl border border-gray-200 dark:border-coal-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Asignar roles</h4>
+          <button type="button" (click)="closePanel()"
+            class="p-1 rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-coal-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+          Selecciona los roles para <strong>{{ selectedUser()!.username }}</strong>
+        </p>
+
+        <div class="space-y-2 mb-5">
+          @for (role of availableRoles; track role) {
+            <button type="button" (click)="toggleRole(role)"
+              [class]="'w-full flex items-center justify-between px-3 py-2 rounded-lg border text-sm font-medium transition-colors '
+                + (isRoleSelected(role)
+                  ? 'bg-[#17C653]/10 border-[#17C653] text-[#17C653]'
+                  : 'border-gray-200 dark:border-coal-200 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-coal-400')">
+              {{ role }}
+              @if (isRoleSelected(role)) {
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              }
+            </button>
+          }
+        </div>
+
+        <button type="button" (click)="onAssignRoles()" [disabled]="isActioning()"
+          class="w-full flex items-center justify-center gap-2 py-2 text-sm font-semibold bg-[#17C653] hover:bg-[#15b34a] disabled:opacity-60 text-white rounded-lg transition-colors">
+          @if (isActioning()) {
+            <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          }
+          Guardar roles
+        </button>
+      </div>
+    }
+
+  </div>
+
+</div>

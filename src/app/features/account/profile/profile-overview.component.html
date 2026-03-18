@@ -1,0 +1,107 @@
+<!-- ── Profile Overview ───────────────────────────────────────────────────── -->
+<div class="grid gap-6 max-w-3xl">
+
+  <!-- Avatar card -->
+  <div class="bg-white dark:bg-coal-300 rounded-2xl border border-gray-200 dark:border-coal-200 p-6 flex items-center gap-5">
+    @if (isLoading()) {
+      <div class="w-20 h-20 rounded-full bg-gray-200 dark:bg-coal-400 animate-pulse"></div>
+      <div class="flex-1 space-y-2">
+        <div class="h-5 w-40 bg-gray-200 dark:bg-coal-400 rounded animate-pulse"></div>
+        <div class="h-3 w-56 bg-gray-200 dark:bg-coal-400 rounded animate-pulse"></div>
+      </div>
+    } @else if (user()) {
+      <div class="flex-shrink-0 w-20 h-20 rounded-full bg-[#17C653] text-white flex items-center justify-center text-2xl font-bold">
+        {{ getInitials() }}
+      </div>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ user()!.firstName }} {{ user()!.lastName }}</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{{ user()!.email }}</p>
+        <div class="flex gap-1.5 mt-2 flex-wrap">
+          @for (role of user()!.roles; track role) {
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#17C653]/10 text-[#17C653]">
+              {{ role }}
+            </span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Edit form -->
+  <div class="bg-white dark:bg-coal-300 rounded-2xl border border-gray-200 dark:border-coal-200 p-6">
+    <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-5">Información personal</h3>
+
+    @if (isLoading()) {
+      <div class="space-y-4">
+        @for (_ of [1,2,3,4]; track _) {
+          <div class="h-10 bg-gray-100 dark:bg-coal-400 rounded-lg animate-pulse"></div>
+        }
+      </div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+
+        <!-- Username -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            Nombre de usuario
+          </label>
+          <input type="text" formControlName="username"
+            [class]="'w-full px-3.5 py-2.5 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
+              + (f['username'].invalid && f['username'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+          @if (f['username'].invalid && f['username'].touched) {
+            <p class="mt-1 text-xs text-red-500">
+              @if (f['username'].hasError('required')) { El usuario es requerido. }
+              @else if (f['username'].hasError('minlength')) { Mínimo 3 caracteres. }
+              @else if (f['username'].hasError('pattern')) { Solo letras, números, puntos, guiones y guiones bajos. }
+            </p>
+          }
+        </div>
+
+        <!-- Name row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nombre</label>
+            <input type="text" formControlName="firstName"
+              class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 dark:border-coal-200 text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 focus:border-[#17C653]" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Apellido</label>
+            <input type="text" formControlName="lastName"
+              class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 dark:border-coal-200 text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 focus:border-[#17C653]" />
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Teléfono</label>
+          <input type="tel" formControlName="phoneNumber" placeholder="+5491100000000"
+            [class]="'w-full px-3.5 py-2.5 rounded-lg border text-sm dark:bg-coal-400 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#17C653]/30 '
+              + (f['phoneNumber'].invalid && f['phoneNumber'].touched ? 'border-red-400' : 'border-gray-300 dark:border-coal-200 focus:border-[#17C653]')" />
+          @if (f['phoneNumber'].invalid && f['phoneNumber'].touched) {
+            <p class="mt-1 text-xs text-red-500">Formato inválido. Ej: +5491100000000</p>
+          }
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" (click)="ngOnInit()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-coal-200 rounded-lg hover:bg-gray-50 dark:hover:bg-coal-400 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="isSaving()"
+            class="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-[#17C653] hover:bg-[#15b34a] disabled:opacity-60 text-white rounded-lg transition-colors">
+            @if (isSaving()) {
+              <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            }
+            Guardar cambios
+          </button>
+        </div>
+
+      </form>
+    }
+  </div>
+
+</div>
