@@ -1,6 +1,7 @@
 import {
   HttpInterceptorFn,
   HttpErrorResponse,
+  HttpEvent,
   HttpRequest,
   HttpHandlerFn
 } from '@angular/common/http';
@@ -47,7 +48,7 @@ function handle401(
   tokenService: TokenService,
   router: Router,
   http: HttpClient
-): Observable<unknown> {
+): Observable<HttpEvent<unknown>> {
   if (!isRefreshing) {
     isRefreshing = true;
     refreshSubject.next(null);
