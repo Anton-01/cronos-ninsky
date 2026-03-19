@@ -12,17 +12,16 @@
                     src="assets/media/avatars/300-2.png" />
                 <div class="flex flex-col gap-1.5">
                     <span class="text-sm font-semibold leading-none text-foreground">
-                        Cody Fisher
+                        {{ username() }}
                     </span>
-                    <a class="hover:text-primary text-xs font-medium leading-none text-secondary-foreground"
-                        href="#">
-                        c.fisher&#64;gmail.com
-                    </a>
+                    <span class="text-xs font-medium leading-none text-secondary-foreground">
+                        {{ email() }}
+                    </span>
+                    <span class="kt-badge kt-badge-sm kt-badge-primary kt-badge-outline">
+                        {{ primaryRole() }}
+                    </span>
                 </div>
             </div>
-            <span class="kt-badge kt-badge-sm kt-badge-primary kt-badge-outline">
-                Pro
-            </span>
         </div>
         <ul class="kt-dropdown-menu-sub">
             <li>
@@ -37,7 +36,7 @@
                 </a>
             </li>
             <li>
-                <a class="kt-dropdown-menu-link" href="#">
+                <a class="kt-dropdown-menu-link" [routerLink]="['/cronos/cuenta/perfil']">
                     <i class="ki-filled ki-profile-circle">
                     </i>
                     My Profile
@@ -87,7 +86,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="kt-dropdown-menu-link" href="#">
+                            <a class="kt-dropdown-menu-link" [routerLink]="['/cronos/cuenta/seguridad']">
                                 <i class="ki-filled ki-medal-star">
                                 </i>
                                 Security
@@ -227,10 +226,11 @@
                        (change)="onThemeToggle($event)"
                        name="check" value="1" />
             </div>
-            <a class="kt-btn kt-btn-outline w-full justify-center"
-                href="#">
+            <button class="kt-btn kt-btn-outline w-full justify-center"
+                type="button"
+                (click)="onLogout()">
                 Log out
-            </a>
+            </button>
         </div>
     </div>
 </div>

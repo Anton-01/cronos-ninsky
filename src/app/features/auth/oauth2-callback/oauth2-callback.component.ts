@@ -41,6 +41,11 @@ export class OAuth2CallbackComponent implements OnInit {
 
     if (accessToken && refreshToken) {
       this.tokenService.saveTokens(accessToken, refreshToken);
+
+      // Extract display data from the JWT payload (sub = username, email claim if present).
+      const payload = this.tokenService.parseJwt(accessToken);
+      this.tokenService.saveUserInfo(payload?.sub ?? '', (payload as any)?.email ?? '');
+
       this.toast.success('Bienvenido', 'Sesión iniciada correctamente.');
       this.router.navigate(['/cronos/dashboard']);
     } else {
