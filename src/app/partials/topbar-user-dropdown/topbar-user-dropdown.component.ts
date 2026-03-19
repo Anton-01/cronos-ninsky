@@ -23,7 +23,7 @@ export class TopbarUserDropdownComponent {
 
   onThemeToggle(event: Event): void {
     const input = event.target as HTMLInputElement | null;
-    if (input && typeof input.checked === 'boolean') {
+    if (input) {
       this.setThemeMode(input.checked ? 'dark' : 'light');
     }
   }
