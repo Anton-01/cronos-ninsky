@@ -9,7 +9,21 @@ import { PageRequest } from '../../../core/models/pagination.model';
 
 type ActionPanel = 'none' | 'details' | 'roles';
 
-const AVAILABLE_ROLES = ['ADMIN', 'USER', 'MANAGER'] as const;
+const AVAILABLE_ROLES = ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'USER'] as const;
+
+const ROLE_BADGE_CLASS: Record<string, string> = {
+  SUPER_ADMIN: 'kt-badge-primary',
+  ADMIN:       'kt-badge-danger',
+  MANAGER:     'kt-badge-info',
+  USER:        'kt-badge-success',
+};
+
+const ROLE_AVATAR_CLASS: Record<string, string> = {
+  SUPER_ADMIN: 'bg-primary',
+  ADMIN:       'bg-destructive',
+  MANAGER:     'bg-info',
+  USER:        'bg-success',
+};
 
 @Component({
   selector: 'app-user-management',
@@ -172,5 +186,34 @@ export class UserManagementComponent implements OnInit {
 
   get pages(): number[] {
     return Array.from({ length: this.totalPages() }, (_, i) => i);
+  }
+
+  // ── Display helpers ────────────────────────────────────────────────────────
+  getInitials(user: UserResponse): string {
+    const first = user.firstName?.[0] ?? user.username[0];
+    const last  = user.lastName?.[0]  ?? '';
+    return (first + last).toUpperCase();
+  }
+
+  getRoleBadgeClass(role: string): string {
+    return ROLE_BADGE_CLASS[role] ?? 'kt-badge-secondary';
+  }
+
+  getAvatarClass(roles: string[]): string {
+    const primary = roles.find(r => ROLE_AVATAR_CLASS[r]);
+    return primary ? ROLE_AVATAR_CLASS[primary] : 'bg-muted-foreground';
+  }
+
+  getDetailRows(user: UserResponse): { label: string; value: string }[] {
+    return [
+      { label: 'ID',                  value: user.id },
+      { label: 'Nombre',              value: `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || '—' },
+      { label: 'Teléfono',            value: user.phoneNumber ?? '—' },
+      { label: '2FA',                 value: user.twoFactorEnabled ? 'Habilitado' : 'Deshabilitado' },
+      { label: 'Intentos fallidos',   value: String(user.failedLoginAttempts) },
+      { label: 'Último acceso',       value: user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString('es-MX') : '—' },
+      { label: 'Contraseña cambiada', value: user.passwordChangedAt ? new Date(user.passwordChangedAt).toLocaleDateString('es-MX') : '—' },
+      { label: 'Miembro desde',       value: new Date(user.createdAt).toLocaleDateString('es-MX') },
+    ];
   }
 }

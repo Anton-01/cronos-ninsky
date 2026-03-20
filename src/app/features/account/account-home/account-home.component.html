@@ -1,0 +1,242 @@
+<!-- ── Account Home ─────────────────────────────────────────────────────────── -->
+<div class="space-y-6">
+
+  <!-- ── Profile Banner ────────────────────────────────────────────────────── -->
+  <div class="card rounded-2xl overflow-hidden shadow-sm border border-border">
+    <!-- Cover -->
+    <div class="h-32 bg-gradient-to-r from-primary/80 via-primary to-primary/60 relative">
+      <div class="absolute inset-0 opacity-10"
+        style="background-image: url('assets/media/misc/bg-1.jpg'); background-size: cover;"></div>
+    </div>
+
+    <!-- Avatar + Info -->
+    <div class="px-6 pb-6 relative">
+      <!-- Avatar (overlaps cover) -->
+      @if (isLoading()) {
+        <div class="w-20 h-20 rounded-full border-4 border-background bg-accent animate-pulse -mt-10 mb-3"></div>
+      } @else {
+        <div class="w-20 h-20 rounded-full border-4 border-background bg-primary text-primary-foreground
+                    flex items-center justify-center text-2xl font-bold -mt-10 mb-3 shadow">
+          {{ getInitials() }}
+        </div>
+      }
+
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div>
+          @if (isLoading()) {
+            <div class="h-6 w-44 bg-accent rounded animate-pulse mb-2"></div>
+            <div class="h-4 w-60 bg-accent rounded animate-pulse mb-2"></div>
+          } @else {
+            <h1 class="text-xl font-bold text-foreground">{{ getDisplayName() }}</h1>
+            <p class="text-sm text-muted-foreground">{{ user()?.email }}</p>
+            <div class="flex flex-wrap gap-1.5 mt-2">
+              @for (role of user()?.roles ?? []; track role) {
+                <span class="kt-badge kt-badge-sm {{ getRoleBadgeClass(role) }}">{{ role }}</span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Quick stats -->
+        @if (!isLoading() && user()) {
+          <div class="flex gap-6 text-center shrink-0">
+            <div>
+              <p class="text-xs text-muted-foreground uppercase tracking-wide">Miembro desde</p>
+              <p class="text-sm font-semibold text-foreground">{{ getMemberSince() }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground uppercase tracking-wide">Último acceso</p>
+              <p class="text-sm font-semibold text-foreground">{{ getLastLogin() }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground uppercase tracking-wide">2FA</p>
+              <p class="text-sm font-semibold" [class]="user()?.twoFactorEnabled ? 'text-success' : 'text-destructive'">
+                {{ user()?.twoFactorEnabled ? 'Activo' : 'Inactivo' }}
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-muted-foreground uppercase tracking-wide">Cuenta</p>
+              <p class="text-sm font-semibold" [class]="user()?.enabled ? 'text-success' : 'text-muted-foreground'">
+                {{ user()?.enabled ? 'Activa' : 'Inactiva' }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-t border-border px-6">
+      <nav class="flex gap-6 -mb-px">
+        <button type="button"
+          (click)="activeTab.set('profile')"
+          [class]="'py-3.5 text-sm font-medium border-b-2 transition-colors ' +
+            (activeTab() === 'profile'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground')">
+          <i class="ki-filled ki-profile-circle me-1.5"></i> Mi Perfil
+        </button>
+        <a [routerLink]="['/cronos/cuenta/seguridad']"
+          class="py-3.5 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground transition-colors">
+          <i class="ki-filled ki-shield-tick me-1.5"></i> Seguridad
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ── Tab Content ────────────────────────────────────────────────────────── -->
+  @if (activeTab() === 'profile') {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Left: Get-Started Checklist -->
+      <div class="lg:col-span-1 space-y-4">
+
+        <!-- Progress card -->
+        <div class="card rounded-2xl border border-border p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-foreground">Configuración de cuenta</h3>
+            <span class="text-xs font-bold text-primary">{{ completionPercent }}%</span>
+          </div>
+          <!-- Progress bar -->
+          <div class="w-full h-1.5 bg-accent rounded-full overflow-hidden mb-4">
+            <div class="h-full bg-primary rounded-full transition-all duration-500"
+              [style.width.%]="completionPercent"></div>
+          </div>
+          <p class="text-xs text-muted-foreground">
+            {{ completedCount }} de {{ checklistItems.length }} pasos completados
+          </p>
+        </div>
+
+        <!-- Checklist items -->
+        <div class="card rounded-2xl border border-border divide-y divide-border">
+          @for (item of checklistItems; track item.key) {
+            <div class="p-4 flex gap-3"
+              [class.opacity-60]="item.done">
+              <!-- Icon / Check -->
+              <div class="shrink-0 mt-0.5">
+                @if (item.done) {
+                  <span class="flex size-8 items-center justify-center rounded-full bg-success/10">
+                    <i class="ki-filled ki-check-circle text-success text-lg"></i>
+                  </span>
+                } @else {
+                  <span class="flex size-8 items-center justify-center rounded-full bg-primary/10">
+                    <i class="{{ item.icon }} text-primary text-lg"></i>
+                  </span>
+                }
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-foreground" [class.line-through]="item.done">
+                  {{ item.title }}
+                </p>
+                <p class="text-xs text-muted-foreground mt-0.5">{{ item.desc }}</p>
+                @if (!item.done) {
+                  @if (item.route) {
+                    <a [routerLink]="[item.route]"
+                      class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                      {{ item.label }} <i class="ki-filled ki-arrow-right text-[10px]"></i>
+                    </a>
+                  } @else {
+                    <button type="button" (click)="item.action && item.action()"
+                      class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                      {{ item.label }} <i class="ki-filled ki-arrow-right text-[10px]"></i>
+                    </button>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right: Profile Form -->
+      <div class="lg:col-span-2">
+        <div class="card rounded-2xl border border-border p-6">
+          <h3 class="text-base font-semibold text-foreground mb-5 flex items-center gap-2">
+            <i class="ki-filled ki-pencil text-primary"></i>
+            Información personal
+          </h3>
+
+          @if (isLoading()) {
+            <div class="space-y-4">
+              @for (_ of [1,2,3,4]; track _) {
+                <div class="h-10 bg-accent rounded-lg animate-pulse"></div>
+              }
+            </div>
+          } @else {
+            <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+
+              <!-- Username -->
+              <div>
+                <label class="block text-sm font-medium text-foreground mb-1.5">
+                  Nombre de usuario
+                </label>
+                <input type="text" formControlName="username"
+                  [class]="'kt-input w-full ' + (f['username'].invalid && f['username'].touched ? 'border-destructive' : '')" />
+                @if (f['username'].invalid && f['username'].touched) {
+                  <p class="mt-1 text-xs text-destructive">
+                    @if (f['username'].hasError('required')) { El usuario es requerido. }
+                    @else if (f['username'].hasError('minlength')) { Mínimo 3 caracteres. }
+                    @else if (f['username'].hasError('pattern')) { Solo letras, números, puntos, guiones y guiones bajos. }
+                  </p>
+                }
+              </div>
+
+              <!-- Name row -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-foreground mb-1.5">Nombre</label>
+                  <input type="text" formControlName="firstName" class="kt-input w-full" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-foreground mb-1.5">Apellido</label>
+                  <input type="text" formControlName="lastName" class="kt-input w-full" />
+                </div>
+              </div>
+
+              <!-- Phone -->
+              <div>
+                <label class="block text-sm font-medium text-foreground mb-1.5">Teléfono</label>
+                <input type="tel" formControlName="phoneNumber" placeholder="+5491100000000"
+                  [class]="'kt-input w-full ' + (f['phoneNumber'].invalid && f['phoneNumber'].touched ? 'border-destructive' : '')" />
+                @if (f['phoneNumber'].invalid && f['phoneNumber'].touched) {
+                  <p class="mt-1 text-xs text-destructive">Formato inválido. Ej: +5491100000000</p>
+                }
+              </div>
+
+              <!-- Email (read-only) -->
+              <div>
+                <label class="block text-sm font-medium text-foreground mb-1.5">
+                  Correo electrónico
+                  <span class="ms-1 text-xs text-muted-foreground">(no editable)</span>
+                </label>
+                <input type="email" [value]="user()?.email ?? ''" disabled
+                  class="kt-input w-full opacity-60 cursor-not-allowed" />
+              </div>
+
+              <!-- Actions -->
+              <div class="flex justify-end gap-3 pt-2 border-t border-border">
+                <button type="button" (click)="ngOnInit()"
+                  class="kt-btn kt-btn-outline">
+                  Cancelar
+                </button>
+                <button type="submit" [disabled]="isSaving()"
+                  class="kt-btn kt-btn-primary disabled:opacity-60">
+                  @if (isSaving()) {
+                    <svg class="animate-spin w-4 h-4 me-1.5" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                  }
+                  Guardar cambios
+                </button>
+              </div>
+
+            </form>
+          }
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

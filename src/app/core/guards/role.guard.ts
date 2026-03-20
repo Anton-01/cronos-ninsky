@@ -4,13 +4,29 @@ import { TokenService } from '../services/token.service';
 import { ToastService } from '../../shared/services/toast.service';
 
 /**
- * Protects routes that require a specific role (default: 'ADMIN').
+ * Numeric hierarchy: higher value = more privileged.
+ * A user whose primary role has level ≥ required level is granted access.
+ *
+ * SUPER_ADMIN  → can access SUPER_ADMIN, ADMIN, MANAGER, USER routes
+ * ADMIN        → can access ADMIN, MANAGER, USER routes
+ * MANAGER      → can access MANAGER, USER routes
+ * USER         → can access USER routes
+ */
+const ROLE_LEVEL: Record<string, number> = {
+  SUPER_ADMIN: 4,
+  ADMIN:       3,
+  MANAGER:     2,
+  USER:        1,
+};
+
+/**
+ * Protects routes that require a minimum role (default: 'ADMIN').
  * Configure via route data: { data: { role: 'ADMIN' } }
  *
  * Behaviour:
- * - Not authenticated  → redirect to /auth/login
- * - Authenticated but missing role → toast warning + redirect to /cronos/dashboard
- * - Has role → allow navigation
+ * - Not authenticated           → redirect to /auth/login
+ * - Primary role level < required level → toast warning + redirect to /cronos/dashboard
+ * - Primary role level ≥ required level → allow navigation
  */
 export const roleGuard: CanActivateFn = (route) => {
   const tokenService = inject(TokenService);
@@ -22,8 +38,12 @@ export const roleGuard: CanActivateFn = (route) => {
   }
 
   const requiredRole: string = route.data?.['role'] ?? 'ADMIN';
+  const primaryRole: string  = tokenService.getPrimaryRole();
 
-  if (tokenService.hasRole(requiredRole)) return true;
+  const userLevel     = ROLE_LEVEL[primaryRole]     ?? 0;
+  const requiredLevel = ROLE_LEVEL[requiredRole]    ?? 0;
+
+  if (userLevel >= requiredLevel) return true;
 
   toast.error(
     'Acceso restringido',

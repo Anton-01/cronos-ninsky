@@ -24,6 +24,7 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { OAuth2CallbackComponent } from './features/auth/oauth2-callback/oauth2-callback.component';
 
 // Account (private – current user)
+import { AccountHomeComponent } from './features/account/account-home/account-home.component';
 import { ProfileOverviewComponent } from './features/account/profile/profile-overview.component';
 import { SecuritySettingsComponent } from './features/account/security/security-settings.component';
 
@@ -65,7 +66,8 @@ export const routes: Routes = [
       { path: 'ingredientes/editar/:id', component: RawMaterialFormComponent },
 
       // ── Account settings ─────────────────────────────────────────────────
-      { path: 'cuenta/perfil',      component: ProfileOverviewComponent },
+      { path: 'cuenta/mi-cuenta',   component: AccountHomeComponent },
+      { path: 'cuenta/perfil',      redirectTo: 'cuenta/mi-cuenta', pathMatch: 'full' },
       { path: 'cuenta/seguridad',   component: SecuritySettingsComponent },
 
       // ── Admin ─────────────────────────────────────────────────────────────
