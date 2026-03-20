@@ -28,17 +28,29 @@ export const roleGuard: CanActivateFn = (route) => {
     return router.createUrlTree(['/auth/login']);
   }
 
-  const requiredRole: string = route.data?.['role'] ?? 'ADMIN';
-  const primaryRole: string  = tokenService.getPrimaryRole();
+  // 1. Rol requerido: Si la ruta no especifica nada, el nivel mínimo es USER (1)
+  // Cambiamos 'ADMIN' por 'USER' para no bloquear rutas generales por error.
+  const requiredRole = route.data?.['role'] ?? 'USER';
+
+  // 2. Obtener el rol del usuario (asegúrate que getPrimaryRole() devuelva "SUPER_ADMIN")
+  const primaryRole = tokenService.getPrimaryRole();
+
+  // DEBUG: Descomenta esta línea para ver exactamente qué está comparando en consola
+  console.log(`User: ${primaryRole} (${ROLE_LEVEL[primaryRole]}), Required: ${requiredRole} (${ROLE_LEVEL[requiredRole]})`);
 
   const userLevel     = ROLE_LEVEL[primaryRole]     ?? 0;
   const requiredLevel = ROLE_LEVEL[requiredRole]    ?? 0;
 
-  if (userLevel >= requiredLevel) return true;
+  // 3. Validación
+  if (userLevel >= requiredLevel) {
+    return true;
+  }
 
+  // 4. Manejo de error
   toast.error(
-    'Acceso restringido',
-    `No tienes permisos para acceder a esta sección. Si necesitas acceso, contacta a un Administrador.`
+      'Acceso restringido',
+      `Tu nivel de acceso (${primaryRole}) no es suficiente para esta sección.`
   );
+
   return router.createUrlTree(['/cronos/dashboard']);
 };
