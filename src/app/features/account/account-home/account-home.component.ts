@@ -13,7 +13,7 @@ type ActiveTab = 'profile' | 'security-link';
 @Component({
   selector: 'app-account-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: './account-home.component.html'
 })
 export class AccountHomeComponent implements OnInit {
