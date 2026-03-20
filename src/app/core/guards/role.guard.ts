@@ -13,21 +13,12 @@ import { ToastService } from '../../shared/services/toast.service';
  * USER         → can access USER routes
  */
 const ROLE_LEVEL: Record<string, number> = {
-  SUPER_ADMIN: 4,
-  ADMIN:       3,
-  MANAGER:     2,
-  USER:        1,
+  'SUPER_ADMIN': 4,
+  'ADMIN':       3,
+  'MANAGER':     2,
+  'USER':        1,
 };
 
-/**
- * Protects routes that require a minimum role (default: 'ADMIN').
- * Configure via route data: { data: { role: 'ADMIN' } }
- *
- * Behaviour:
- * - Not authenticated           → redirect to /auth/login
- * - Primary role level < required level → toast warning + redirect to /cronos/dashboard
- * - Primary role level ≥ required level → allow navigation
- */
 export const roleGuard: CanActivateFn = (route) => {
   const tokenService = inject(TokenService);
   const router       = inject(Router);
