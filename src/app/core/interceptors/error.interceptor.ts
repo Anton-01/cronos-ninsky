@@ -7,38 +7,41 @@ import {
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { TokenService } from '../services/token.service';
+import { AuthService } from '../services/auth.service';
 import { ToastService } from '../../shared/services/toast.service';
 import { ErrorResponse } from '../models/error-response.model';
-import { ApiResponse } from '../models/api-response.model';
-import { TokenResponse } from '../models/auth.model';
-import { environment } from '../../../environments/environment';
 
-// Module-level singletons to coordinate concurrent 401 responses
+// Module-level singletons para coordinar respuestas 401 concurrentes
 let isRefreshing = false;
-let refreshSubject = new BehaviorSubject<string | null>(null);
+let refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenService = inject(TokenService);
+  const authService  = inject(AuthService);
   const router       = inject(Router);
-  const http         = inject(HttpClient);
   const toast        = inject(ToastService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // 401 from the refresh or login endpoints themselves → just propagate
+      // 401 desde los propios endpoints de refresh o login → solo propagar
       if (
         error.status === 401 &&
         !req.url.includes('/auth/refresh') &&
         !req.url.includes('/auth/login')
       ) {
-        return handle401(req, next, tokenService, router, http, toast);
+        return handle401(req, next, tokenService, authService, router, toast);
       }
 
-      // 403 / 404 / 500 → show red toast, NEVER close the session
+      // 401 en /auth/refresh → el refresh token expiró o fue revocado
+      if (error.status === 401 && req.url.includes('/auth/refresh')) {
+        performLogoutAndRedirect(tokenService, authService, router, toast);
+        return throwError(() => error.error as ErrorResponse);
+      }
+
+      // 403 / 404 / 500 → mostrar toast rojo, NUNCA cerrar la sesión
       if (error.status === 403 || error.status === 404 || error.status === 500) {
         const errorBody = error.error as ErrorResponse;
         const msg = errorBody?.message || 'Ha ocurrido un error inesperado.';
@@ -56,46 +59,41 @@ function handle401(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
   tokenService: TokenService,
+  authService: AuthService,
   router: Router,
-  http: HttpClient,
   toast: ToastService
 ): Observable<HttpEvent<unknown>> {
   if (!isRefreshing) {
     isRefreshing = true;
-    refreshSubject.next(null);
+    refreshTokenSubject.next(null);
 
     const refreshToken = tokenService.getRefreshToken();
     if (!refreshToken) {
       isRefreshing = false;
-      performLogoutAndRedirect(tokenService, router, http, toast);
+      performLogoutAndRedirect(tokenService, authService, router, toast);
       return throwError(() => ({ message: 'No refresh token available' }));
     }
 
-    return http
-      .post<ApiResponse<TokenResponse>>(
-        `${environment.apiUrl}/auth/refresh`,
-        { refreshToken }
-      )
-      .pipe(
-        switchMap(res => {
-          isRefreshing = false;
-          tokenService.saveTokens(res.data.accessToken, res.data.refreshToken);
-          refreshSubject.next(res.data.accessToken);
-          return next(cloneWithToken(req, res.data.accessToken));
-        }),
-        catchError(err => {
-          isRefreshing = false;
-          performLogoutAndRedirect(tokenService, router, http, toast);
-          return throwError(() => err?.error as ErrorResponse);
-        })
-      );
+    return authService.refreshToken(refreshToken).pipe(
+      switchMap(res => {
+        isRefreshing = false;
+        tokenService.saveTokens(res.data.accessToken, res.data.refreshToken);
+        refreshTokenSubject.next(res.data.accessToken);
+        return next(cloneWithToken(req, res.data.accessToken));
+      }),
+      catchError(err => {
+        isRefreshing = false;
+        performLogoutAndRedirect(tokenService, authService, router, toast);
+        return throwError(() => err?.error as ErrorResponse);
+      })
+    );
   }
 
-  // Another request already triggered a refresh — wait for the new token
-  return refreshSubject.pipe(
+  // Otra petición ya disparó el refresh — esperar el nuevo token
+  return refreshTokenSubject.pipe(
     filter(token => token !== null),
     take(1),
-    switchMap(token => next(cloneWithToken(req, token!)))
+    switchMap(token => next(cloneWithToken(req, token)))
   );
 }
 
@@ -107,13 +105,14 @@ function cloneWithToken(
 }
 
 /**
- * Best-effort backend logout → show session-expired toast → clear tokens → redirect.
- * The logout POST is fire-and-forget: we log out locally regardless of whether it succeeds.
+ * Mejor esfuerzo: invalidar sesión en el backend → mostrar toast →
+ * limpiar localStorage → redirigir al login.
+ * El POST de logout es fire-and-forget: el cierre local ocurre siempre.
  */
 function performLogoutAndRedirect(
   tokenService: TokenService,
+  authService: AuthService,
   router: Router,
-  http: HttpClient,
   toast: ToastService
 ): void {
   const doFinalLogout = () => {
@@ -125,12 +124,10 @@ function performLogoutAndRedirect(
     router.navigate(['/auth/login']);
   };
 
-  const refreshToken = tokenService.getRefreshToken();
-  if (refreshToken) {
-    // Best-effort: notify the backend so it can invalidate the session server-side.
-    // We use subscribe with complete/error callbacks so the logout always happens.
-    http
-      .post(`${environment.apiUrl}/auth/logout`, { refreshToken })
+  const storedRefreshToken = tokenService.getRefreshToken();
+  if (storedRefreshToken) {
+    authService
+      .logout(storedRefreshToken)
       .subscribe({ complete: doFinalLogout, error: doFinalLogout });
   } else {
     doFinalLogout();

@@ -11,7 +11,8 @@ import {
   RegisterRequest,
   ChangePasswordRequest,
   TwoFactorSetupResponse,
-  VerifyTwoFactorRequest
+  VerifyTwoFactorRequest,
+  TokenResponse
 } from '../models/auth.model';
 import { UserResponse } from '../models/user.model';
 import { ActiveSession, LoginHistoryEntry } from '../models/session.model';
@@ -26,6 +27,10 @@ export class AuthService {
 
   login(request: LoginRequest): Observable<ApiResponse<LoginResponse>> {
     return this.http.post<ApiResponse<LoginResponse>>(`${this.API}/login`, request);
+  }
+
+  refreshToken(refreshToken: string): Observable<ApiResponse<TokenResponse>> {
+    return this.http.post<ApiResponse<TokenResponse>>(`${this.API}/refresh`, { refreshToken });
   }
 
   register(request: RegisterRequest): Observable<ApiResponse<UserResponse>> {
